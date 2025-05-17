@@ -1,13 +1,8 @@
-'use client'
-import React from 'react'
-import { Button } from "@/components/ui/button"
+"use client";
+import DesktopComponent from "./desktop/DesktopComponent";
 
 const Page = () => {
-  return (
-    <div>
-      <Button onClick={()=>{alert("Clik")}}>Click me</Button>
-    </div>
-  )
-}
+  return <DesktopComponent />;
+};
 
-export default Page
+export default Page;
