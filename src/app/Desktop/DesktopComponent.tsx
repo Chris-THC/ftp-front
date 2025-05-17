@@ -39,6 +39,7 @@ export default function DesktopComponent() {
   const [files, setFiles] = useState<File[]>([]);
   const [notification, setNotification] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Estado para la edición de nombres
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
@@ -48,6 +49,23 @@ export default function DesktopComponent() {
     // Mapear los datos del servidor al estado inicial
     setFiles(serverData);
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        editingItemId &&
+        containerRef.current &&
+        !containerRef.current.contains(e.target as Node)
+      ) {
+        finishEditing(true); // Renombrar al hacer clic fuera
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [editingItemId, editingName]);
 
   const handleIconClick = (e: React.MouseEvent, fullPath: string) => {
     console.log(`Icon clicked: ${fullPath}`);
@@ -93,7 +111,10 @@ export default function DesktopComponent() {
   };
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-[#20252A]">
+    <div
+      ref={containerRef}
+      className="relative w-full h-screen overflow-hidden bg-[#20252A]"
+    >
       <div
         className="absolute inset-0 z-0 bg-cover bg-center"
         style={{
