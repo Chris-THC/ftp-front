@@ -37,6 +37,7 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
     e.stopPropagation();
     clearTimeout(clickTimeout);
     clickTimeout = setTimeout(() => handleIconClick(e, file.fullPath), 200);
+    console.log("Click timeout set for", file.fullPath);
   };
 
   const handleDoubleClickWrapper = (e: React.MouseEvent) => {
