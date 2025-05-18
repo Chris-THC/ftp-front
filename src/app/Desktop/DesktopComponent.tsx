@@ -5,122 +5,18 @@ import { useEffect, useRef, useState } from "react";
 import TopBar from "../components/TopBar";
 import DesktopFile from "./components/DesktopFile";
 import { File } from "./interface/Interface";
-
-// Simulación de la respuesta del servidor
-const serverData: File[] = [
-  {
-    name: "0001-Alfonso_Flores_Leal",
-    fullPath: "/home/admin/0001-Alfonso_Flores_Leal",
-    timestamp: "17 May 2025, 01:38:00 PM",
-    children: [
-      {
-        name: "Carpeta1",
-        fullPath: "/home/admin/0001-Alfonso_Flores_Leal/Carpeta1",
-        timestamp: "17 May 2025, 01:37:00 PM",
-        children: [],
-        directory: true,
-        file: false,
-      },
-      {
-        name: "img2.jpg",
-        fullPath: "/home/admin/0001-Alfonso_Flores_Leal/img2.jpg",
-        timestamp: "17 May 2025, 12:44:00 PM",
-        children: [],
-        directory: false,
-        file: true,
-      },
-      {
-        name: "track.mp3",
-        fullPath: "/home/admin/0001-Alfonso_Flores_Leal/track.mp3",
-        timestamp: "17 May 2025, 01:38:00 PM",
-        children: [],
-        directory: false,
-        file: true,
-      },
-      {
-        name: "video.mp4",
-        fullPath: "/home/admin/0001-Alfonso_Flores_Leal/video.mp4",
-        timestamp: "17 May 2025, 01:38:00 PM",
-        children: [],
-        directory: false,
-        file: true,
-      },
-    ],
-    directory: true,
-    file: false,
-  },
-  {
-    name: "19011297_Cristofer_Amador_Hernandez",
-    fullPath: "/home/admin/19011297_Cristofer_Amador_Hernandez",
-    timestamp: "17 May 2025, 01:39:00 PM",
-    children: [
-      {
-        name: "CarpetaNueva",
-        fullPath:
-          "/home/admin/19011297_Cristofer_Amador_Hernandez/CarpetaNueva",
-        timestamp: "17 May 2025, 01:39:00 PM",
-        children: [],
-        directory: true,
-        file: false,
-      },
-      {
-        name: "spring.jpg",
-        fullPath: "/home/admin/19011297_Cristofer_Amador_Hernandez/spring.jpg",
-        timestamp: "17 May 2025, 01:38:00 PM",
-        children: [],
-        directory: false,
-        file: true,
-      },
-      {
-        name: "testPDF.pdf",
-        fullPath: "/home/admin/19011297_Cristofer_Amador_Hernandez/testPDF.pdf",
-        timestamp: "17 May 2025, 01:39:00 PM",
-        children: [],
-        directory: false,
-        file: true,
-      },
-    ],
-    directory: true,
-    file: false,
-  },
-  {
-    name: "CarpetaNueva",
-    fullPath: "/home/admin/19011297_Cristofer_Amador_Hernandez/CarpetaNueva",
-    timestamp: "17 May 2025, 01:39:00 PM",
-    children: [],
-    directory: true,
-    file: false,
-  },
-  {
-    name: "spring.jpg",
-    fullPath: "/home/admin/19011297_Cristofer_Amador_Hernandez/spring.jpg",
-    timestamp: "17 May 2025, 01:38:00 PM",
-    children: [],
-    directory: false,
-    file: true,
-  },
-  {
-    name: "testPDF.pdf",
-    fullPath: "/home/admin/19011297_Cristofer_Amador_Hernandez/testPDF.pdf",
-    timestamp: "17 May 2025, 01:39:00 PM",
-    children: [],
-    directory: false,
-    file: true,
-  },
-];
+import { serverData } from "./interface/Data";
 
 export default function DesktopComponent() {
   const [files, setFiles] = useState<File[]>([]);
   const [notification, setNotification] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Estado para la edición de nombres
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState<string>("");
 
   useEffect(() => {
-    // Mapear los datos del servidor al estado inicial
     setFiles(serverData);
   }, []);
 
@@ -131,7 +27,7 @@ export default function DesktopComponent() {
         containerRef.current &&
         !containerRef.current.contains(e.target as Node)
       ) {
-        finishEditing(true); // Renombrar al hacer clic fuera
+        finishEditing(true);
       }
     };
 
@@ -142,7 +38,7 @@ export default function DesktopComponent() {
   }, [editingItemId, editingName]);
 
   const handleIconClick = (e: React.MouseEvent, fullPath: string) => {
-    console.log(`Icon clicked: ${fullPath}`);
+    e.stopPropagation();
     const file = files.find((file) => file.fullPath === fullPath);
     if (file) {
       setNotification(`"${file.name}" seleccionado`);
@@ -155,10 +51,13 @@ export default function DesktopComponent() {
     if (file) {
       setEditingItemId(fullPath);
       setEditingName(file.name);
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 0);
     }
   };
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNameChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setEditingName(e.target.value);
   };
 
@@ -176,8 +75,9 @@ export default function DesktopComponent() {
     setEditingName("");
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
       finishEditing(true);
     } else if (e.key === "Escape") {
       finishEditing(false);
@@ -209,6 +109,7 @@ export default function DesktopComponent() {
             handleDoubleClick={handleDoubleClick}
             handleNameChange={handleNameChange}
             handleKeyDown={handleKeyDown}
+            finishEditing={finishEditing}
           />
         ))}
 

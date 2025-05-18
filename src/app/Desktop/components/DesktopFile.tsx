@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Folder, File as FileIcon } from "lucide-react";
 import { File } from "../interface/Interface";
 
@@ -6,11 +6,12 @@ interface DesktopFileProps {
   file: File;
   editingItemId: string | null;
   editingName: string;
-  inputRef: React.RefObject<HTMLInputElement>;
+  inputRef: React.RefObject<HTMLTextAreaElement>;
   handleIconClick: (e: React.MouseEvent, fullPath: string) => void;
   handleDoubleClick: (fullPath: string) => void;
-  handleNameChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  handleNameChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  handleKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+  finishEditing: () => void;
 }
 
 const DesktopFile: React.FC<DesktopFileProps> = ({
@@ -22,6 +23,7 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
   handleDoubleClick,
   handleNameChange,
   handleKeyDown,
+  finishEditing,
 }) => {
   const icon = file.directory ? (
     <Folder className="h-10 w-10" fill="#FFB74D" stroke="#F57C00" />
@@ -43,6 +45,15 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
     handleDoubleClick(file.fullPath);
   };
 
+  // Ajusta la altura automáticamente
+  useEffect(() => {
+    if (editingItemId === file.fullPath && inputRef.current) {
+      const textarea = inputRef.current;
+      textarea.style.height = "auto";
+      textarea.style.height = textarea.scrollHeight + "px";
+    }
+  }, [editingName, editingItemId]);
+
   return (
     <div
       className="flex flex-col items-center w-24 cursor-pointer"
@@ -59,14 +70,14 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
 
       {editingItemId === file.fullPath ? (
         <div className="mt-1 px-1 bg-black/40 rounded w-full">
-          <input
+          <textarea
             ref={inputRef}
-            type="text"
             value={editingName}
             onChange={handleNameChange}
             onKeyDown={handleKeyDown}
-            size={editingName.length || 1} // Ajusta el tamaño del input al texto
-            className="w-auto text-center text-white text-sm border-none outline-none bg-black/40 rounded"
+            onBlur={() => finishEditing()}
+            rows={1}
+            className="w-full resize-none text-center text-white text-sm border-none outline-none bg-transparent rounded break-words overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           />
         </div>
