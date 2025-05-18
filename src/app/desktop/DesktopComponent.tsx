@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import TopBar from "../components/TopBar";
 import DesktopFile from "./components/DesktopFile";
 import { useFolderTreeQuery } from "../api/GetFiles/FtpFilesTree";
+import { useRenameMutation } from "../api/GetFiles/FtpRename";
 
 export default function DesktopComponent() {
   const [notification, setNotification] = useState<string | null>(null);
@@ -18,6 +19,8 @@ export default function DesktopComponent() {
     isLoading,
     isError,
   } = useFolderTreeQuery("/home/admin");
+
+  const renameMutation = useRenameMutation();
 
   // Simulamos cambio local del nombre mientras se edita
   const displayedFiles = useMemo(() => {
@@ -68,10 +71,28 @@ export default function DesktopComponent() {
   };
 
   const finishEditing = (save = true) => {
-    // Aquí podrías llamar a una mutación si necesitas guardar el cambio en el backend
+    if (save && editingItemId) {
+      const oldPath = editingItemId;
+      const newPath = `${oldPath.substring(
+        0,
+        oldPath.lastIndexOf("/") + 1
+      )}${editingName}`;
+
+      renameMutation.mutate(
+        { oldPath, newPath },
+        {
+          onSuccess: () => {
+            console.log(`Renamed successfully: ${oldPath} -> ${newPath}`);
+          },
+          onError: () => {
+            console.error("Failed to rename the file or folder.");
+          },
+        }
+      );
+    }
+
     setEditingItemId(null);
     setEditingName("");
-    console.log("Este es el nuevo nombre:", save ? editingName : "sin guardar");
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

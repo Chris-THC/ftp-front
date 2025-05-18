@@ -62,7 +62,7 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
       onDoubleClick={handleDoubleClickWrapper}
     >
       <div
-        className={`flex items-center justify-center w-16 h-16 rounded-full ${
+        className={`flex items-center justify-center w-14 h-14 rounded-full ${
           file.directory ? "bg-[#FFB74D]" : "bg-gray-600"
         }`}
       >
@@ -83,7 +83,10 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
           />
         </div>
       ) : (
-        <span className="mt-1 px-1 text-center text-white text-sm bg-black/40 rounded break-words max-w-[100px]">
+        <span
+          className="mt-1 px-1 text-center text-white text-sm rounded break-words max-w-[100px]"
+          style={{ textShadow: "0px 0px 3px black, 1px 1px 2px black" }}
+        >
           {file.name}
         </span>
       )}
