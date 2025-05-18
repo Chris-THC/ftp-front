@@ -71,7 +71,7 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
           />
         </div>
       ) : (
-        <span className="mt-1 px-1 text-center text-white text-sm bg-black/40 rounded">
+        <span className="mt-1 px-1 text-center text-white text-sm bg-black/40 rounded break-words max-w-[100px]">
           {file.name}
         </span>
       )}
