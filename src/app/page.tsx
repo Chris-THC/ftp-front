@@ -1,4 +1,5 @@
 "use client";
+
 import DesktopComponent from "./desktop/DesktopComponent";
 
 const Page = () => {
