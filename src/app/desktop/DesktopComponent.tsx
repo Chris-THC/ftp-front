@@ -1,14 +1,11 @@
 "use client";
 
-import type React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import TopBar from "../components/TopBar";
 import DesktopFile from "./components/DesktopFile";
-import { File } from "./interface/Interface";
-import { serverData } from "./interface/Data";
+import { useFolderTreeQuery } from "../api/GetFiles/FtpFilesTree";
 
 export default function DesktopComponent() {
-  const [files, setFiles] = useState<File[]>([]);
   const [notification, setNotification] = useState<string | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -16,9 +13,18 @@ export default function DesktopComponent() {
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState<string>("");
 
-  useEffect(() => {
-    setFiles(serverData);
-  }, []);
+  const {
+    data: files = [],
+    isLoading,
+    isError,
+  } = useFolderTreeQuery("/home/admin");
+
+  // Simulamos cambio local del nombre mientras se edita
+  const displayedFiles = useMemo(() => {
+    return files.map((file) =>
+      file.fullPath === editingItemId ? { ...file, name: editingName } : file
+    );
+  }, [files, editingItemId, editingName]);
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -62,17 +68,10 @@ export default function DesktopComponent() {
   };
 
   const finishEditing = (save = true) => {
-    if (save && editingItemId) {
-      setFiles((prev) =>
-        prev.map((file) =>
-          file.fullPath === editingItemId
-            ? { ...file, name: editingName }
-            : file
-        )
-      );
-    }
+    // Aquí podrías llamar a una mutación si necesitas guardar el cambio en el backend
     setEditingItemId(null);
     setEditingName("");
+    console.log("Este es el nuevo nombre:", save ? editingName : "sin guardar");
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -83,6 +82,9 @@ export default function DesktopComponent() {
       finishEditing(false);
     }
   };
+
+  if (isLoading) return <p>Cargando...</p>;
+  if (isError) return <p>Error al cargar los datos.</p>;
 
   return (
     <div
@@ -98,7 +100,7 @@ export default function DesktopComponent() {
       />
       <TopBar />
       <div className="relative z-0 w-full h-[calc(100vh-40px)] grid grid-cols-[repeat(auto-fill,_120px)] gap-4 p-4 mx-10 my-8">
-        {files.map((file) => (
+        {displayedFiles.map((file) => (
           <DesktopFile
             key={file.fullPath}
             file={file}
