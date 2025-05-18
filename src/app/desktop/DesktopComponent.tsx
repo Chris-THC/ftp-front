@@ -83,9 +83,6 @@ export default function DesktopComponent() {
     }
   };
 
-  if (isLoading) return <p>Cargando...</p>;
-  if (isError) return <p>Error al cargar los datos.</p>;
-
   return (
     <div
       ref={containerRef}
@@ -99,22 +96,30 @@ export default function DesktopComponent() {
         }}
       />
       <TopBar />
-      <div className="relative z-0 w-full h-[calc(100vh-40px)] grid grid-cols-[repeat(auto-fill,_120px)] gap-4 p-4 mx-10 my-8">
-        {displayedFiles.map((file) => (
-          <DesktopFile
-            key={file.fullPath}
-            file={file}
-            editingItemId={editingItemId}
-            editingName={editingName}
-            inputRef={inputRef}
-            handleIconClick={handleIconClick}
-            handleDoubleClick={handleDoubleClick}
-            handleNameChange={handleNameChange}
-            handleKeyDown={handleKeyDown}
-            finishEditing={finishEditing}
-          />
-        ))}
 
+      <div className="relative z-0 w-full h-[calc(100vh-40px)] grid grid-cols-[repeat(auto-fill,_120px)] gap-4 p-4 mx-10 my-8">
+        {isLoading ? (
+          <p className="col-span-full text-center text-white"></p>
+        ) : isError ? (
+          <p className="col-span-full text-center text-red-500">
+            Error al cargar los datos.
+          </p>
+        ) : (
+          displayedFiles.map((file) => (
+            <DesktopFile
+              key={file.fullPath}
+              file={file}
+              editingItemId={editingItemId}
+              editingName={editingName}
+              inputRef={inputRef}
+              handleIconClick={handleIconClick}
+              handleDoubleClick={handleDoubleClick}
+              handleNameChange={handleNameChange}
+              handleKeyDown={handleKeyDown}
+              finishEditing={finishEditing}
+            />
+          ))
+        )}
         {notification && (
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-md">
             {notification}
