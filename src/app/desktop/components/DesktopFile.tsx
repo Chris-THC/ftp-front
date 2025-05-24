@@ -5,7 +5,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Download, Edit, File as FileIcon, Folder, Trash2 } from "lucide-react";
+import { Download, File as FileIcon, Folder, Trash2 } from "lucide-react";
 import React, { useEffect } from "react";
 import { File } from "../interface/Interface";
 
@@ -61,10 +61,6 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
     }
   }, [editingName, editingItemId]);
 
-  function handleRename(file: File): void {
-    console.log(`Function not implemented. ${file.name}`);
-  }
-
   function handleDownload(file: File): void {
     console.log(`Function not implemented. ${file.name}`);
   }
@@ -91,10 +87,6 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
         </DropdownMenuTrigger>
         {!file.directory && (
           <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem onClick={() => handleRename(file)}>
-              <Edit className="mr-2 h-4 w-4" />
-              Renombrar
-            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleDownload(file)}>
               <Download className="mr-2 h-4 w-4" />
               Descargar
