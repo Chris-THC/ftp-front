@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: "http://192.168.1.69:8081/ftp",
+  baseURL: "http://192.168.1.64:8081/ftp",
   headers: {
     "Content-Type": "application/json",
   },

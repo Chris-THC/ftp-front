@@ -128,7 +128,7 @@ export default function DesktopComponent() {
       />
       <TopBar />
 
-      <div className="relative z-0 w-full h-[calc(100vh-40px)] grid grid-cols-[repeat(auto-fill,_120px)] gap-4 p-4 mx-10 my-8">
+      <div className="relative z-0 w-full h-[calc(12vh-40px)] grid grid-cols-[repeat(auto-fill,_120px)] gap-4 p-4 mx-10 my-8">
         {isLoading ? (
           <p className="col-span-full text-center text-white"></p>
         ) : isError ? (
