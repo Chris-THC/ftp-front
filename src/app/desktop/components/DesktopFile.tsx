@@ -1,3 +1,4 @@
+import { useDeleteFile } from "@/app/api/GetFiles/FtpDeleteFiles";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +14,7 @@ import {
   Trash2,
 } from "lucide-react";
 import React, { useEffect } from "react";
+import toast from "react-hot-toast";
 import { File } from "../interface/Interface";
 
 interface DesktopFileProps {
@@ -38,6 +40,8 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
   handleKeyDown,
   finishEditing,
 }) => {
+  const deleteFile = useDeleteFile();
+
   const icon = file.directory ? (
     <Folder className="h-10 w-10" fill="#FFB74D" stroke="#F57C00" />
   ) : (
@@ -72,9 +76,20 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
 
   function handleDelete(file: File, e?: React.MouseEvent): void {
     if (e) e.stopPropagation(); // Evita que el click del menú propague
-    console.log("Archivo Eliminado TEST");
-  }
 
+    if (file.directory) {
+      deleteFile.mutate(file.fullPath, {
+        onSuccess: () => {
+          toast.success("Carpeta eliminada con éxito.");
+        },
+        onError: () => {
+          toast.error("Error al eliminar la carpeta.");
+        },
+      });
+    } else {
+      console.log(`Eliminando archivo: ${file.name}`);
+    }
+  }
   // El menú se muestra para archivos y carpetas.
   const renderMenu = () => (
     <DropdownMenu>

@@ -16,12 +16,9 @@ export const useRenameMutation = () => {
     mutationFn: ({ oldPath, newPath }: { oldPath: string; newPath: string }) =>
       renameFileOrFolder(oldPath, newPath),
     onSuccess: () => {
-      // Invalida y actualiza la caché de la carpeta actual
       queryClient.invalidateQueries({ queryKey: ["folderTree"] });
     },
     onError: (error) => {
-      // Agregra un toast o un mensaje de error
-      // Aquí puedes manejar el error, por ejemplo, mostrando un mensaje al usuario
       console.error("Error renaming file or folder:", error);
     },
   });
