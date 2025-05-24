@@ -5,7 +5,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Download, File as FileIcon, Folder, Trash2 } from "lucide-react";
+import {
+  Download,
+  File as FileIcon,
+  Folder,
+  MoreHorizontal,
+  Trash2,
+} from "lucide-react";
 import React, { useEffect } from "react";
 import { File } from "../interface/Interface";
 
@@ -52,7 +58,6 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
     handleDoubleClick(e, file.fullPath);
   };
 
-  // Ajusta la altura automáticamente
   useEffect(() => {
     if (editingItemId === file.fullPath && inputRef.current) {
       const textarea = inputRef.current;
@@ -65,44 +70,56 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
     console.log(`Function not implemented. ${file.name}`);
   }
 
-  function handleDelete(file: File): void {
-    console.log(`Function not implemented. ${file.name}`);
+  function handleDelete(file: File, e?: React.MouseEvent): void {
+    if (e) e.stopPropagation(); // Evita que el click del menú propague
+    console.log("Archivo Eliminado TEST");
   }
+
+  // El menú se muestra para archivos y carpetas.
+  const renderMenu = () => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button
+          className="absolute bottom-0 right-0 bg-black/20 rounded-b-sm group-hover:flex flex items-center justify-center"
+          onClick={(e) => e.stopPropagation()}
+          tabIndex={-1}
+        >
+          <MoreHorizontal className="h-6 w-6 text-white" />
+        </button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-48">
+        {!file.directory && (
+          <DropdownMenuItem onClick={() => handleDownload(file)}>
+            <Download className="mr-2 h-4 w-4" />
+            Descargar
+          </DropdownMenuItem>
+        )}
+        {!file.directory && <DropdownMenuSeparator />}
+        <DropdownMenuItem
+          onClick={(e) => handleDelete(file, e)}
+          className="text-red-600 focus:text-red-600"
+        >
+          <Trash2 className="mr-2 h-4 w-4" />
+          Eliminar
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 
   return (
     <div
-      className="flex flex-col items-center w-24 cursor-pointer"
+      className="relative flex flex-col items-center w-24 cursor-pointer group"
       onClick={handleClick}
       onDoubleClick={handleDoubleClickWrapper}
     >
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <div
-            className={`flex items-center justify-center w-14 h-14 rounded-full ${
-              file.directory ? "bg-[#FFB74D]" : "bg-gray-600"
-            }`}
-          >
-            {icon}
-          </div>
-        </DropdownMenuTrigger>
-        {!file.directory && (
-          <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem onClick={() => handleDownload(file)}>
-              <Download className="mr-2 h-4 w-4" />
-              Descargar
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              onClick={() => handleDelete(file)}
-              className="text-red-600 focus:text-red-600"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Eliminar
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        )}
-      </DropdownMenu>
-
+      <div
+        className={`flex items-center justify-center w-16 h-16 rounded-sm relative ${
+          file.directory ? "bg-[#FFB74D]" : "bg-gray-600"
+        }`}
+      >
+        {icon}
+        {renderMenu()}
+      </div>
       {editingItemId === file.fullPath ? (
         <div className="mt-1 px-1 bg-black/40 rounded w-full">
           <textarea
