@@ -54,10 +54,16 @@ export default function DesktopComponent() {
     if (file) {
       setNotification(`"${file.name}" seleccionado`);
       setTimeout(() => setNotification(null), 2000);
+  
+      if (file.directory) {
+        router.push(`/explorer`);
+      } else {
+        // Aquí puedes manejar la lógica para mostrar el submenú
+        console.log(`Mostrar menú para el archivo: ${file.name}`);
+      }
     }
-    router.push(`/explorer`);
   };
-
+  
   const handleDoubleClick = (e: React.MouseEvent, fullPath: string) => {
     e.stopPropagation(); // Evita conflictos con otros eventos
     const file = files.find((file) => file.fullPath === fullPath);

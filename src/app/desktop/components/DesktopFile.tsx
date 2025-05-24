@@ -1,5 +1,12 @@
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Download, Edit, File as FileIcon, Folder, Trash2 } from "lucide-react";
 import React, { useEffect } from "react";
-import { Folder, File as FileIcon } from "lucide-react";
 import { File } from "../interface/Interface";
 
 interface DesktopFileProps {
@@ -54,20 +61,55 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
     }
   }, [editingName, editingItemId]);
 
+  function handleRename(file: File): void {
+    console.log(`Function not implemented. ${file.name}`);
+  }
+
+  function handleDownload(file: File): void {
+    console.log(`Function not implemented. ${file.name}`);
+  }
+
+  function handleDelete(file: File): void {
+    console.log(`Function not implemented. ${file.name}`);
+  }
+
   return (
     <div
       className="flex flex-col items-center w-24 cursor-pointer"
       onClick={handleClick}
       onDoubleClick={handleDoubleClickWrapper}
     >
-      <div
-        className={`flex items-center justify-center w-14 h-14 rounded-full ${
-          file.directory ? "bg-[#FFB74D]" : "bg-gray-600"
-        }`}
-        onClick={(e) => handleIconClick(e, file.fullPath)}
-      >
-        {icon}
-      </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <div
+            className={`flex items-center justify-center w-14 h-14 rounded-full ${
+              file.directory ? "bg-[#FFB74D]" : "bg-gray-600"
+            }`}
+          >
+            {icon}
+          </div>
+        </DropdownMenuTrigger>
+        {!file.directory && (
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem onClick={() => handleRename(file)}>
+              <Edit className="mr-2 h-4 w-4" />
+              Renombrar
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => handleDownload(file)}>
+              <Download className="mr-2 h-4 w-4" />
+              Descargar
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => handleDelete(file)}
+              className="text-red-600 focus:text-red-600"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Eliminar
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        )}
+      </DropdownMenu>
 
       {editingItemId === file.fullPath ? (
         <div className="mt-1 px-1 bg-black/40 rounded w-full">
@@ -86,8 +128,8 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
         <span
           className="mt-1 px-1 text-center text-white text-sm rounded break-words max-w-[100px]"
           style={{ textShadow: "0px 0px 3px black, 1px 1px 2px black" }}
-          onClick={(e) => e.stopPropagation()} // Evita la redirección al hacer clic en el nombre
-          onDoubleClick={(e) => handleDoubleClick(e, file.fullPath)} // Doble clic en el nombre
+          onClick={(e) => e.stopPropagation()}
+          onDoubleClick={(e) => handleDoubleClick(e, file.fullPath)}
         >
           {file.name}
         </span>
