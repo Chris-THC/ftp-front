@@ -5,6 +5,7 @@ import TopBar from "../components/TopBar";
 import DesktopFile from "./components/DesktopFile";
 import { useFolderTreeQuery } from "../api/GetFiles/FtpFilesTree";
 import { useRenameMutation } from "../api/GetFiles/FtpRename";
+import { useRouter } from "next/navigation";
 
 export default function DesktopComponent() {
   const [notification, setNotification] = useState<string | null>(null);
@@ -13,6 +14,7 @@ export default function DesktopComponent() {
 
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState<string>("");
+  const router = useRouter();
 
   const {
     data: files = [],
@@ -47,15 +49,17 @@ export default function DesktopComponent() {
   }, [editingItemId, editingName]);
 
   const handleIconClick = (e: React.MouseEvent, fullPath: string) => {
-    e.stopPropagation();
+    e.stopPropagation(); // Evita que el evento se propague al contenedor
     const file = files.find((file) => file.fullPath === fullPath);
     if (file) {
       setNotification(`"${file.name}" seleccionado`);
       setTimeout(() => setNotification(null), 2000);
     }
+    router.push(`/explorer`);
   };
 
-  const handleDoubleClick = (fullPath: string) => {
+  const handleDoubleClick = (e: React.MouseEvent, fullPath: string) => {
+    e.stopPropagation(); // Evita conflictos con otros eventos
     const file = files.find((file) => file.fullPath === fullPath);
     if (file) {
       setEditingItemId(fullPath);
@@ -133,8 +137,8 @@ export default function DesktopComponent() {
               editingItemId={editingItemId}
               editingName={editingName}
               inputRef={inputRef}
-              handleIconClick={handleIconClick}
-              handleDoubleClick={handleDoubleClick}
+              handleIconClick={(e) => handleIconClick(e, file.fullPath)}
+              handleDoubleClick={(e) => handleDoubleClick(e, file.fullPath)}
               handleNameChange={handleNameChange}
               handleKeyDown={handleKeyDown}
               finishEditing={finishEditing}

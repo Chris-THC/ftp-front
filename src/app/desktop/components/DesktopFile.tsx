@@ -8,7 +8,7 @@ interface DesktopFileProps {
   editingName: string;
   inputRef: React.RefObject<HTMLTextAreaElement>;
   handleIconClick: (e: React.MouseEvent, fullPath: string) => void;
-  handleDoubleClick: (fullPath: string) => void;
+  handleDoubleClick: (e: React.MouseEvent, fullPath: string) => void;
   handleNameChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   handleKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   finishEditing: () => void;
@@ -37,13 +37,12 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
     e.stopPropagation();
     clearTimeout(clickTimeout);
     clickTimeout = setTimeout(() => handleIconClick(e, file.fullPath), 200);
-    console.log("Click timeout set for", file.fullPath);
   };
 
   const handleDoubleClickWrapper = (e: React.MouseEvent) => {
     e.stopPropagation();
     clearTimeout(clickTimeout);
-    handleDoubleClick(file.fullPath);
+    handleDoubleClick(e, file.fullPath);
   };
 
   // Ajusta la altura automáticamente
@@ -65,6 +64,7 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
         className={`flex items-center justify-center w-14 h-14 rounded-full ${
           file.directory ? "bg-[#FFB74D]" : "bg-gray-600"
         }`}
+        onClick={(e) => handleIconClick(e, file.fullPath)}
       >
         {icon}
       </div>
@@ -86,6 +86,8 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
         <span
           className="mt-1 px-1 text-center text-white text-sm rounded break-words max-w-[100px]"
           style={{ textShadow: "0px 0px 3px black, 1px 1px 2px black" }}
+          onClick={(e) => e.stopPropagation()} // Evita la redirección al hacer clic en el nombre
+          onDoubleClick={(e) => handleDoubleClick(e, file.fullPath)} // Doble clic en el nombre
         >
           {file.name}
         </span>
