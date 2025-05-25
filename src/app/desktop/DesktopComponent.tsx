@@ -52,9 +52,7 @@ export default function DesktopComponent() {
     e.stopPropagation(); // Evita que el evento se propague al contenedor
     const file = files.find((file) => file.fullPath === fullPath);
     if (file) {
-      setNotification(`"${file.name}" seleccionado`);
       setTimeout(() => setNotification(null), 2000);
-  
       if (file.directory) {
         router.push(`/explorer`);
       } else {
@@ -63,7 +61,7 @@ export default function DesktopComponent() {
       }
     }
   };
-  
+
   const handleDoubleClick = (e: React.MouseEvent, fullPath: string) => {
     e.stopPropagation(); // Evita conflictos con otros eventos
     const file = files.find((file) => file.fullPath === fullPath);
