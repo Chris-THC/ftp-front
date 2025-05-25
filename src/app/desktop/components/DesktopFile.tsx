@@ -1,4 +1,4 @@
-import { useDeleteFile } from "@/app/api/GetFiles/FtpDeleteFiles";
+import { useDeleteDirectory } from "@/app/api/GetFiles/FtpDeleteDirectory";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +16,7 @@ import {
 import React, { useEffect } from "react";
 import toast from "react-hot-toast";
 import { File } from "../interface/Interface";
+import { useDeleteFileMutation } from "@/app/api/GetFiles/FtpDeleteFile";
 
 interface DesktopFileProps {
   file: File;
@@ -40,7 +41,8 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
   handleKeyDown,
   finishEditing,
 }) => {
-  const deleteFile = useDeleteFile();
+  const ftpDeleteDirectory = useDeleteDirectory();
+  const ftpDeleteFile = useDeleteFileMutation(); // Asumiendo que tienes un hook para eliminar archivos
 
   const icon = file.directory ? (
     <Folder className="h-10 w-10" fill="#FFB74D" stroke="#F57C00" />
@@ -78,7 +80,7 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
     if (e) e.stopPropagation(); // Evita que el click del menú propague
 
     if (file.directory) {
-      deleteFile.mutate(file.fullPath, {
+      ftpDeleteDirectory.mutate(file.fullPath, {
         onSuccess: () => {
           toast.success("Carpeta eliminada con éxito.");
         },
@@ -87,7 +89,14 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
         },
       });
     } else {
-      console.log(`Eliminando archivo: ${file.name}`);
+      ftpDeleteFile.mutate(file.fullPath, {
+        onSuccess: () => {
+          toast.success("Archivo eliminado con éxito.");
+        },
+        onError: () => {
+          toast.error("Error al eliminar el archivo.");
+        },
+      });
     }
   }
   // El menú se muestra para archivos y carpetas.

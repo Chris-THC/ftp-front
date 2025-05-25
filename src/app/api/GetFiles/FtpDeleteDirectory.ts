@@ -2,7 +2,7 @@ import apiClient from "../client/ApiClient";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 // Función para eliminar un archivo o carpeta
-export const deleteFileOrFolder = async (path: string) => {
+export const deleteDirectory = async (path: string) => {
   const response = await apiClient.delete("/delete/directory", {
     data: { path },
   });
@@ -10,11 +10,11 @@ export const deleteFileOrFolder = async (path: string) => {
 };
 
 // Hook para manejar la mutación de eliminación
-export const useDeleteFile = () => {
+export const useDeleteDirectory = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (path: string) => deleteFileOrFolder(path),
+    mutationFn: (path: string) => deleteDirectory(path),
     onSuccess: () => {
       // Invalida y actualiza la caché de la carpeta actual
       queryClient.invalidateQueries({ queryKey: ["folderTree"] });

@@ -10,7 +10,7 @@ const apiClient = axios.create({
 // Interceptor para agregar el token JWT
 apiClient.interceptors.request.use((config) => {
   const token =
-    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwMTIxIiwiaWRVc2VyIjoxLCJpZFBlcnNvbmFsSW5mbyI6MSwicm9sZSI6IkFkbWluIiwicGVyc29uYWxQYXRoIjoiL2hvbWUvYWRtaW4iLCJpYXQiOjE3NDgxMDkxNjQsImV4cCI6MTc0ODE0NTE2NH0.WiA-ilenfR9FnEzYw-RDSYzkG3HXXFp8JzYNteo1v7M";
+    "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIwMTIxIiwiaWRVc2VyIjoxLCJpZFBlcnNvbmFsSW5mbyI6MSwicm9sZSI6IkFkbWluIiwicGVyc29uYWxQYXRoIjoiL2hvbWUvYWRtaW4iLCJpYXQiOjE3NDgxMzEwODIsImV4cCI6MTc0ODE2NzA4Mn0.1tJXIEDsWKi9YNrSzHLeVdGuKl-uprNq5QrmJi0ggXc";
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
