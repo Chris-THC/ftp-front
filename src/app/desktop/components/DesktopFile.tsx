@@ -17,6 +17,7 @@ import React, { useEffect } from "react";
 import toast from "react-hot-toast";
 import { File } from "../interface/Interface";
 import { useDeleteFileMutation } from "@/app/api/GetFiles/FtpDeleteFile";
+import downloadFile from "@/app/api/GetFiles/FtpDonwload";
 
 interface DesktopFileProps {
   file: File;
@@ -72,9 +73,15 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
     }
   }, [editingName, editingItemId]);
 
-  function handleDownload(file: File): void {
-    console.log(`Function not implemented. ${file.name}`);
-  }
+  const handleDownload = async (file: File): Promise<void> => {
+    console.log(`Function not implemented. ${file.fullPath}`);
+    try {
+      await downloadFile(file.fullPath);
+      console.log("Archivo descargado exitosamente");
+    } catch (error) {
+      console.error("Error al descargar el archivo:", error);
+    }
+  };
 
   function handleDelete(file: File, e?: React.MouseEvent): void {
     if (e) e.stopPropagation(); // Evita que el click del menú propague
