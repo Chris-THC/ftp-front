@@ -1,10 +1,18 @@
 import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
 import {
   File,
   FolderPlus,
@@ -15,20 +23,16 @@ import {
   User,
 } from "lucide-react";
 import { useRef, useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import toast from "react-hot-toast";
+import { useUploadFile } from "../api/GetFiles/FtpUploadFile";
 
 const TopBar = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const uploadFile = useUploadFile();
 
   const handleFileUploadClick = () => {
     fileInputRef.current?.click();
@@ -37,10 +41,18 @@ const TopBar = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      console.log("Ruta del archivo seleccionado:", file.name);
-      // Aquí podrías agregar lógica para subir el archivo
+      uploadFile.mutate(
+        { file, remotePath: "/home/admin" },
+        {
+          onSuccess: () => {
+            toast.success("Archivo subido exitosamente");
+          },
+          onError: () => {
+            toast.error("Error al subir el archivo");
+          },
+        }
+      );
     }
-    // Opcional: limpiar el input de archivo para permitir la misma selección de nuevo
     e.target.value = "";
   };
 
@@ -94,10 +106,7 @@ const TopBar = () => {
               <Upload className="w-4 h-4 mr-2" />
               Subir archivo
             </DropdownMenuItem>
-            <DropdownMenuItem className="hover:bg-gray-100 cursor-pointer">
-              <Upload className="w-4 h-4 mr-2" />
-              Subir carpeta
-            </DropdownMenuItem>
+
             <div className="border-t border-gray-300 my-1" />
             <DropdownMenuItem className="hover:bg-gray-100 cursor-pointer">
               <File className="w-4 h-4 mr-2 text-blue-600" />
@@ -110,10 +119,6 @@ const TopBar = () => {
             <DropdownMenuItem className="hover:bg-gray-100 cursor-pointer">
               <File className="w-4 h-4 mr-2 text-red-600" />
               Presentación PowerPoint
-            </DropdownMenuItem>
-            <DropdownMenuItem className="hover:bg-gray-100 cursor-pointer">
-              <File className="w-4 h-4 mr-2 text-purple-600" />
-              Bloc de OneNote
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -131,10 +136,10 @@ const TopBar = () => {
       <Dialog
         open={isFolderModalOpen}
         onOpenChange={(open) => {
-          console.log("Dialog onOpenChange:", open); // Para depuración
+          console.log("Dialog onOpenChange:", open);
           setIsFolderModalOpen(open);
           if (!open) {
-            setFolderName(""); // Limpiar el input cuando el modal se cierra
+            setFolderName("");
           }
         }}
       >
@@ -151,7 +156,7 @@ const TopBar = () => {
           <DialogFooter className="flex justify-end gap-2 mt-4">
             <Button
               variant="outline"
-              onClick={() => setIsFolderModalOpen(false)} // Cierra el modal
+              onClick={() => setIsFolderModalOpen(false)}
             >
               Cancelar
             </Button>
