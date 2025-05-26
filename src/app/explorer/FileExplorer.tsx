@@ -7,7 +7,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import {
   Table,
   TableBody,
@@ -17,22 +16,15 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  ChevronLeft,
   ChevronRight,
-  Columns,
   Folder,
   Grid,
-  HelpCircle,
-  List,
-  Maximize2,
+  Menu,
   MessageSquare,
-  Minus,
   MoreVertical,
   RefreshCw,
   Search,
-  Star,
   User,
-  X,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -40,6 +32,7 @@ export default function FileExplorer() {
   const [expandedFolders, setExpandedFolders] = useState<string[]>([
     "NAS_DEPI",
   ]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
   const toggleFolder = (folder: string) => {
     if (expandedFolders.includes(folder)) {
@@ -49,11 +42,24 @@ export default function FileExplorer() {
     }
   };
 
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   return (
     <div className="flex flex-col h-screen bg-white">
       {/* Top Navigation Bar */}
       <div className="flex justify-between items-center bg-black text-white h-10 px-2">
         <div className="flex space-x-2">
+          {/* Menu Hamburger Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-white md:hidden"
+            onClick={toggleSidebar}
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
           <Button variant="ghost" size="icon" className="h-8 w-8 text-white">
             <Grid className="h-5 w-5" />
           </Button>
@@ -78,32 +84,14 @@ export default function FileExplorer() {
         </div>
       </div>
 
-      {/* File Station Header */}
-      <div className="flex justify-between items-center border-b p-2">
-        <div className="flex items-center">
-          <Folder className="h-5 w-5 text-amber-500 mr-2" />
-          <span className="font-medium">File Station</span>
-        </div>
-        <div className="flex space-x-2">
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <HelpCircle className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <Minus className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <Maximize2 className="h-4 w-4" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left Sidebar */}
-        <div className="w-60 border-r overflow-y-auto">
+        <div
+          className={`${
+            isSidebarOpen ? "block" : "hidden"
+          } md:block w-60 border-r overflow-y-auto transition-all duration-300`}
+        >
           <div className="p-2">
             <div
               className="flex items-center p-2 cursor-pointer"
@@ -129,32 +117,6 @@ export default function FileExplorer() {
 
         {/* Right Content Area */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Navigation Bar */}
-          <div className="flex items-center border-b p-2">
-            <div className="flex items-center space-x-1">
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <RefreshCw className="h-4 w-4" />
-              </Button>
-            </div>
-
-            <div className="flex items-center mx-2 border rounded px-2 py-1 flex-1">
-              <span>DEPI</span>
-              <Button variant="ghost" size="icon" className="h-6 w-6 ml-auto">
-                <Star className="h-4 w-4" />
-              </Button>
-            </div>
-
-            <div className="flex items-center">
-              <Input type="text" placeholder="Buscar" className="h-8 w-60" />
-            </div>
-          </div>
-
           {/* Action Buttons */}
           <div className="flex items-center border-b p-2 space-x-2">
             <Button variant="outline" size="sm">
@@ -197,15 +159,6 @@ export default function FileExplorer() {
             <Button variant="outline" size="sm">
               Configuración
             </Button>
-
-            <div className="ml-auto flex space-x-2">
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <List className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <Columns className="h-4 w-4" />
-              </Button>
-            </div>
           </div>
 
           {/* File List */}
