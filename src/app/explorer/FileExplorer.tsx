@@ -17,22 +17,45 @@ import {
 } from "@/components/ui/table";
 import {
   ChevronRight,
+  FileText,
   Folder,
   Grid,
   Menu,
   MessageSquare,
   MoreVertical,
-  RefreshCw,
   Search,
   User,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { dataTest } from "./dataTest";
+
+interface FileItem {
+  name: string;
+  fullPath: string;
+  timestamp: string;
+  children: FileItem[];
+  directory: boolean;
+  file: boolean;
+}
 
 export default function FileExplorer() {
-  const [expandedFolders, setExpandedFolders] = useState<string[]>([
-    "NAS_DEPI",
-  ]);
+  const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
+  const [fileData, setFileData] = useState<FileItem[]>(dataTest);
+
+  // Fetch data from API
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await fetch("/api/files"); // Cambia esta URL a la de tu API
+        const data: FileItem[] = await response.json();
+        setFileData(data);
+      } catch (error) {
+        console.error("Error fetching file data:", error);
+      }
+    }
+    fetchData();
+  }, []);
 
   const toggleFolder = (folder: string) => {
     if (expandedFolders.includes(folder)) {
@@ -46,12 +69,81 @@ export default function FileExplorer() {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+   const renderFileTree = (items: FileItem[]) => {
+    // Filtrar solo directorios
+    const directories = items.filter((item) => item.directory);
+  
+    return directories.map((item) => {
+      return (
+        <div key={item.fullPath} className="ml-4">
+          <div
+            className="flex items-center p-2 cursor-pointer"
+            onClick={() => toggleFolder(item.fullPath)}
+          >
+            <ChevronRight
+              className={`h-4 w-4 mr-1 transition-transform ${
+                expandedFolders.includes(item.fullPath) ? "rotate-90" : ""
+              }`}
+            />
+            <Folder className="h-5 w-5 text-amber-500 mr-2" />
+            <span className="font-medium">{item.name}</span>
+          </div>
+          {expandedFolders.includes(item.fullPath) && (
+            <div className="ml-4">{renderFileTree(item.children)}</div>
+          )}
+        </div>
+      );
+    });
+  };
+
+  const renderActionsMenu = (item: FileItem) => {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="icon">
+            <MoreVertical className="h-5 w-5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          {item.directory ? (
+            <>
+              <DropdownMenuItem onClick={() => console.log("Abrir carpeta")}>
+                Abrir carpeta
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => console.log("Renombrar carpeta")}
+              >
+                Renombrar
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => console.log("Eliminar carpeta")}>
+                Eliminar
+              </DropdownMenuItem>
+            </>
+          ) : (
+            <>
+              <DropdownMenuItem onClick={() => console.log("Abrir archivo")}>
+                Abrir archivo
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => console.log("Descargar archivo")}
+              >
+                Descargar
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => console.log("Eliminar archivo")}>
+                Eliminar
+              </DropdownMenuItem>
+            </>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  };
+
   return (
     <div className="flex flex-col h-screen bg-white">
       {/* Top Navigation Bar */}
       <div className="flex justify-between items-center bg-black text-white h-10 px-2">
         <div className="flex space-x-2">
-          {/* Menu Hamburger Button */}
           <Button
             variant="ghost"
             size="icon"
@@ -92,114 +184,44 @@ export default function FileExplorer() {
             isSidebarOpen ? "block" : "hidden"
           } md:block w-60 border-r overflow-y-auto transition-all duration-300`}
         >
-          <div className="p-2">
-            <div
-              className="flex items-center p-2 cursor-pointer"
-              onClick={() => toggleFolder("NAS_DEPI")}
-            >
-              <ChevronRight
-                className={`h-4 w-4 mr-1 transition-transform ${
-                  expandedFolders.includes("NAS_DEPI") ? "rotate-90" : ""
-                }`}
-              />
-              <span className="font-medium">NAS_DEPI</span>
-            </div>
-
-            {expandedFolders.includes("NAS_DEPI") && (
-              <div className="ml-4">
-                <div className="flex items-center p-2 bg-blue-50 text-blue-700 rounded">
-                  <span className="font-medium">DEPI</span>
-                </div>
-              </div>
-            )}
-          </div>
+          <div className="p-2">{renderFileTree(fileData)}</div>
         </div>
 
         {/* Right Content Area */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Action Buttons */}
-          <div className="flex items-center border-b p-2 space-x-2">
-            <Button variant="outline" size="sm">
-              Crear carpeta
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
-                  Cargar <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem>Subir archivos</DropdownMenuItem>
-                <DropdownMenuItem>Subir carpeta</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
-                  Acción <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem>Copiar</DropdownMenuItem>
-                <DropdownMenuItem>Mover</DropdownMenuItem>
-                <DropdownMenuItem>Eliminar</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm">
-                  Herramientas <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem>Buscar</DropdownMenuItem>
-                <DropdownMenuItem>Propiedades</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <Button variant="outline" size="sm">
-              Configuración
-            </Button>
-          </div>
-
           {/* File List */}
           <div className="flex-1 overflow-auto">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[400px]">Nombre</TableHead>
-                  <TableHead>Tamaño</TableHead>
-                  <TableHead>Tipo de archivo</TableHead>
+                  <TableHead>Tipo</TableHead>
                   <TableHead>Fecha de modificación</TableHead>
-                  <TableHead className="w-8"></TableHead>
+                  <TableHead>Acciones</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                <TableRow>
-                  <TableCell className="font-medium">
-                    <div className="flex items-center">
-                      <Folder className="h-5 w-5 text-amber-500 mr-2" />
-                      DEPI 24
-                    </div>
-                  </TableCell>
-                  <TableCell></TableCell>
-                  <TableCell>Carpeta</TableCell>
-                  <TableCell>05/11/2024 07:22:03</TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
+                {fileData.map((item) => (
+                  <TableRow key={item.fullPath}>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center">
+                        {item.directory ? (
+                          <Folder className="h-5 w-5 text-amber-500 mr-2" />
+                        ) : (
+                          <FileText className="h-5 w-5 text-gray-500 mr-2" />
+                        )}
+                        {item.name}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {item.directory ? "Carpeta" : "Archivo"}
+                    </TableCell>
+                    <TableCell>{item.timestamp}</TableCell>
+                    <TableCell>{renderActionsMenu(item)}</TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
-          </div>
-
-          {/* Status Bar */}
-          <div className="flex justify-between items-center border-t p-2 text-sm text-gray-600">
-            <span>1 elemento</span>
-            <div className="flex items-center">
-              <RefreshCw className="h-4 w-4 ml-2" />
-            </div>
           </div>
         </div>
       </div>
