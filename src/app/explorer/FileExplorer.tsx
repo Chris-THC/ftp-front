@@ -27,8 +27,9 @@ import {
   Search,
   User,
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useFolderTreeQuery } from "../api/GetFiles/FtpFilesTree"; // Tu hook existente
+import ActionButtons from "./components/ActionButtons";
 
 interface FileItem {
   name: string;
@@ -232,24 +233,6 @@ export default function FileExplorer() {
     );
   };
 
-  // Manejo de estados de carga y error combinados
-  if (isLoadingContent || isLoadingTree) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        Cargando archivos...
-      </div>
-    );
-  }
-
-  if (isErrorContent || isErrorTree) {
-    return (
-      <div className="flex justify-center items-center h-screen text-red-500">
-        Error al cargar los archivos:{" "}
-        {contentError?.message || treeError?.message}
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col h-screen bg-white">
       {/* Top Navigation Bar */}
@@ -312,47 +295,61 @@ export default function FileExplorer() {
           {/* Breadcrumb / Ruta de navegación */}
           {renderBreadcrumb}
 
+          {/* Action Buttons */}
+          <ActionButtons />
+
           {/* File List */}
           <div className="flex-1 overflow-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[400px]">Nombre</TableHead>
-                  <TableHead>Tipo</TableHead>
-                  <TableHead>Fecha de modificación</TableHead>
-                  <TableHead>Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {currentFolderContent?.map((item) => (
-                  <TableRow
-                    key={item.fullPath}
-                    className={
-                      item.directory ? "cursor-pointer hover:bg-gray-50" : ""
-                    }
-                    onClick={() =>
-                      item.directory && handleFolderNavigation(item.fullPath)
-                    }
-                  >
-                    <TableCell className="font-medium">
-                      <div className="flex items-center">
-                        {item.directory ? (
-                          <Folder className="h-5 w-5 text-amber-500 mr-2" />
-                        ) : (
-                          <FileText className="h-5 w-5 text-gray-500 mr-2" />
-                        )}
-                        {item.name}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {item.directory ? "Carpeta" : "Archivo"}
-                    </TableCell>
-                    <TableCell>{item.timestamp}</TableCell>
-                    <TableCell>{renderActionsMenu(item)}</TableCell>
+            {isLoadingContent || isLoadingTree ? (
+              <div className="flex justify-center items-center h-full">
+                Cargando archivos...
+              </div>
+            ) : isErrorContent || isErrorTree ? (
+              <div className="flex justify-center items-center h-full text-red-500">
+                Error al cargar los archivos:{" "}
+                {contentError?.message || treeError?.message}
+              </div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-[400px]">Nombre</TableHead>
+                    <TableHead>Tipo</TableHead>
+                    <TableHead>Fecha de modificación</TableHead>
+                    <TableHead>Acciones</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {currentFolderContent?.map((item) => (
+                    <TableRow
+                      key={item.fullPath}
+                      className={
+                        item.directory ? "cursor-pointer hover:bg-gray-50" : ""
+                      }
+                      onClick={() =>
+                        item.directory && handleFolderNavigation(item.fullPath)
+                      }
+                    >
+                      <TableCell className="font-medium">
+                        <div className="flex items-center">
+                          {item.directory ? (
+                            <Folder className="h-5 w-5 text-amber-500 mr-2" />
+                          ) : (
+                            <FileText className="h-5 w-5 text-gray-500 mr-2" />
+                          )}
+                          {item.name}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {item.directory ? "Carpeta" : "Archivo"}
+                      </TableCell>
+                      <TableCell>{item.timestamp}</TableCell>
+                      <TableCell>{renderActionsMenu(item)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </div>
         </div>
       </div>
