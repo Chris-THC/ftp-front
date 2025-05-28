@@ -30,6 +30,7 @@ import {
 import { useMemo, useState } from "react";
 import { useFolderTreeQuery } from "../api/GetFiles/FtpFilesTree"; // Tu hook existente
 import ActionButtons from "./components/ActionButtons";
+import { useStoreFullPath } from "@/lib/store/StoreUserFullPath";
 
 interface FileItem {
   name: string;
@@ -41,9 +42,11 @@ interface FileItem {
 }
 
 export default function FileExplorer() {
+  const { userFullPath } = useStoreFullPath();
+
   const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
-  const [currentPath, setCurrentPath] = useState<string>("/home/admin"); // Estado para la ruta actual
+  const [currentPath, setCurrentPath] = useState<string>(userFullPath);
 
   // Consulta para el contenido de la carpeta actual (para la tabla principal)
   const {
@@ -60,7 +63,7 @@ export default function FileExplorer() {
     isLoading: isLoadingTree,
     isError: isErrorTree,
     error: treeError,
-  } = useFolderTreeQuery("/home/admin"); // Siempre pide la raíz para el árbol
+  } = useFolderTreeQuery(userFullPath);
 
   const toggleFolder = (folder: string) => {
     if (expandedFolders.includes(folder)) {
