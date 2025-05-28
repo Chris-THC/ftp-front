@@ -15,22 +15,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useStoreFullPath } from "@/lib/store/StoreUserFullPath";
 import {
   ChevronRight,
   FileText,
   Folder,
-  Grid,
   Home,
   Menu,
   MessageSquare,
   MoreVertical,
   Search,
-  User,
+  User
 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useFolderTreeQuery } from "../api/GetFiles/FtpFilesTree"; // Tu hook existente
+import { useFolderTreeQuery } from "../api/GetFiles/FtpFilesTree";
 import ActionButtons from "./components/ActionButtons";
-import { useStoreFullPath } from "@/lib/store/StoreUserFullPath";
 
 interface FileItem {
   name: string;
@@ -63,7 +62,7 @@ export default function FileExplorer() {
     isLoading: isLoadingTree,
     isError: isErrorTree,
     error: treeError,
-  } = useFolderTreeQuery(userFullPath);
+  } = useFolderTreeQuery(userFullPath); // Esta consulta ya debería devolver solo el contenido accesible al usuario
 
   const toggleFolder = (folder: string) => {
     if (expandedFolders.includes(folder)) {
@@ -77,9 +76,15 @@ export default function FileExplorer() {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const handleGoHome = () => {
+    // Aqui se apllicara la logica cuando se aplique los roles del usuario
+    console.log("Ir a la carpeta raíz del usuario");
+  };
+
   const handleFolderNavigation = (path: string) => {
     setCurrentPath(path);
     // Expandir la carpeta en el árbol cuando se navega a ella
+    // Asegúrate de que solo se expandan rutas válidas dentro del fullPath del usuario
     const pathSegments = path.split("/").filter(Boolean);
     let currentSegmentPath = "";
     const pathsToExpand = pathSegments.map((segment) => {
@@ -93,31 +98,71 @@ export default function FileExplorer() {
 
   // Función para construir la ruta de navegación (breadcrumb)
   const renderBreadcrumb = useMemo(() => {
-    const segments = currentPath.split("/").filter(Boolean);
-    let pathAccumulator = "";
+    // 1. Obtener segmentos de la ruta del usuario (su "raíz" permitida)
+    const userPathSegments = userFullPath.split("/").filter(Boolean);
+    // 2. Obtener segmentos de la ruta actual
+    const currentPathSegments = currentPath.split("/").filter(Boolean);
+
+    // 3. Encontrar el punto de inicio para los segmentos a mostrar en el breadcrumb.
+    // Esto asegura que no mostremos "home", "admin" si el userFullPath ya los contiene.
+    let startIndex = 0;
+    for (let i = 0; i < userPathSegments.length; i++) {
+      if (userPathSegments[i] === currentPathSegments[i]) {
+        startIndex++;
+      } else {
+        break; // La ruta actual diverge de la ruta del usuario
+      }
+    }
+
+    // 4. Los segmentos a "mostrar" en el breadcrumb serán solo los que están después del userFullPath.
+    const displaySegments = currentPathSegments.slice(startIndex);
+
+    // 5. Inicializar el acumulador de ruta con la ruta completa del usuario.
+    // Esto es crucial para construir enlaces de navegación válidos desde la "raíz" del usuario.
+    let pathAccumulator = userFullPath;
 
     return (
       <div className="flex items-center space-x-1 text-sm text-gray-600 px-4 py-2 bg-gray-50 border-b">
+        {/* Botón "Home": Siempre lleva a la carpeta raíz designada del usuario */}
         <Button
           variant="ghost"
           size="icon"
           className="h-6 w-6 text-gray-500"
-          onClick={() => handleFolderNavigation("/home/admin")}
-          title="Ir a la raíz"
+          onClick={() => handleFolderNavigation(userFullPath)}
+          title="Ir a mi carpeta raíz"
         >
           <Home className="h-4 w-4" />
         </Button>
-        {segments.map((segment, index) => {
+
+        {/* Muestra el nombre de la carpeta raíz del usuario como el primer elemento del breadcrumb */}
+        {userPathSegments.length > 0 && (
+          <div className="flex items-center">
+            <ChevronRight className="h-3 w-3 mx-1 text-gray-400" />
+            <Button
+              variant="link"
+              className="p-0 h-auto text-gray-600 hover:text-blue-600"
+              onClick={() => handleFolderNavigation(userFullPath)}
+            >
+              {userPathSegments[userPathSegments.length - 1]}
+            </Button>
+          </div>
+        )}
+
+        {/* Mapea los segmentos restantes para construir el resto del breadcrumb */}
+        {displaySegments.map((segment, index) => {
+          // Construye la ruta completa acumulada para este segmento
           pathAccumulator += `/${segment}`;
           const fullSegmentPath = pathAccumulator;
-          const isLast = index === segments.length - 1;
+          const isLast = index === displaySegments.length - 1;
 
           return (
             <div key={fullSegmentPath} className="flex items-center">
               <ChevronRight className="h-3 w-3 mx-1 text-gray-400" />
               {isLast ? (
+                // El último segmento no es clickeable
                 <span className="font-semibold text-gray-800">{segment}</span>
               ) : (
+                // Los segmentos intermedios son clickeables
                 <Button
                   variant="link"
                   className="p-0 h-auto text-gray-600 hover:text-blue-600"
@@ -131,7 +176,7 @@ export default function FileExplorer() {
         })}
       </div>
     );
-  }, [currentPath]);
+  }, [currentPath, userFullPath]);
 
   // Esta función ahora renderiza el árbol completo desde la raíz
   const renderFileTree = (items: FileItem[], level = 0) => {
@@ -249,8 +294,13 @@ export default function FileExplorer() {
           >
             <Menu className="h-5 w-5" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-white">
-            <Grid className="h-5 w-5" />
+          <Button
+            onClick={handleGoHome}
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-white"
+          >
+            <Home className="h-5 w-5" />
           </Button>
           <Button
             variant="ghost"
@@ -282,12 +332,14 @@ export default function FileExplorer() {
           } md:block w-60 border-r overflow-y-auto transition-all duration-300`}
         >
           <div className="p-2">
-            {/* Renderizamos el árbol con los datos de rootTreeData */}
+            {/* Renderizamos el árbol con los datos de rootTreeData. 
+                Asegúrate de que rootTreeData solo contenga la estructura de carpetas
+                accesible desde la ruta designada del usuario. */}
             {rootTreeData && rootTreeData.length > 0
-              ? renderFileTree(rootTreeData)
+              ? renderFileTree(rootTreeData, 0) // Explicitly start level at 0 for proper indentation
               : !isLoadingTree && (
                   <p className="text-gray-500 text-sm">
-                    No hay carpetas en la raíz.
+                    No hay carpetas disponibles en tu raíz.
                   </p>
                 )}
           </div>
