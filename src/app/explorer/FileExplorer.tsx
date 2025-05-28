@@ -20,16 +20,15 @@ import {
   FileText,
   Folder,
   Grid,
-  Home, // Importamos el icono de Home
+  Home,
   Menu,
   MessageSquare,
   MoreVertical,
   Search,
   User,
 } from "lucide-react";
-import { useState, useMemo } from "react"; // Importamos useMemo
-import { useFolderTreeQuery } from "../api/GetFiles/FtpFilesTree";
-// Ajusta la ruta si es necesario
+import { useState, useMemo } from "react";
+import { useFolderTreeQuery } from "../api/GetFiles/FtpFilesTree"; // Tu hook existente
 
 interface FileItem {
   name: string;
@@ -45,12 +44,22 @@ export default function FileExplorer() {
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
   const [currentPath, setCurrentPath] = useState<string>("/home/admin"); // Estado para la ruta actual
 
+  // Consulta para el contenido de la carpeta actual (para la tabla principal)
   const {
-    data: fileData,
-    isLoading,
-    isError,
-    error,
+    data: currentFolderContent,
+    isLoading: isLoadingContent,
+    isError: isErrorContent,
+    error: contentError,
   } = useFolderTreeQuery(currentPath);
+
+  // Consulta para el árbol completo desde la raíz (para el sidebar)
+  // ¡Asumimos que tu API devolverá la estructura anidada completa cuando se le pase "/home/admin"!
+  const {
+    data: rootTreeData,
+    isLoading: isLoadingTree,
+    isError: isErrorTree,
+    error: treeError,
+  } = useFolderTreeQuery("/home/admin"); // Siempre pide la raíz para el árbol
 
   const toggleFolder = (folder: string) => {
     if (expandedFolders.includes(folder)) {
@@ -66,14 +75,21 @@ export default function FileExplorer() {
 
   const handleFolderNavigation = (path: string) => {
     setCurrentPath(path);
-    // Opcional: Si quieres expandir la carpeta en el árbol cuando navegas a ella.
-    // Esto podría volverse complejo si las carpetas no están ya en el árbol.
-    // setExpandedFolders((prev) => Array.from(new Set([...prev, path])));
+    // Expandir la carpeta en el árbol cuando se navega a ella
+    const pathSegments = path.split("/").filter(Boolean);
+    let currentSegmentPath = "";
+    const pathsToExpand = pathSegments.map((segment) => {
+      currentSegmentPath += `/${segment}`;
+      return currentSegmentPath;
+    });
+    setExpandedFolders((prev) =>
+      Array.from(new Set([...prev, ...pathsToExpand]))
+    );
   };
 
   // Función para construir la ruta de navegación (breadcrumb)
   const renderBreadcrumb = useMemo(() => {
-    const segments = currentPath.split("/").filter(Boolean); // Filtra cadenas vacías
+    const segments = currentPath.split("/").filter(Boolean);
     let pathAccumulator = "";
 
     return (
@@ -82,7 +98,7 @@ export default function FileExplorer() {
           variant="ghost"
           size="icon"
           className="h-6 w-6 text-gray-500"
-          onClick={() => handleFolderNavigation("/home/admin")} // Vuelve a la raíz definida
+          onClick={() => handleFolderNavigation("/home/admin")}
           title="Ir a la raíz"
         >
           <Home className="h-4 w-4" />
@@ -111,40 +127,55 @@ export default function FileExplorer() {
         })}
       </div>
     );
-  }, [currentPath]); // Recalcular solo cuando currentPath cambie
+  }, [currentPath]);
 
-  const renderFileTree = (items: FileItem[]) => {
+  // Esta función ahora renderiza el árbol completo desde la raíz
+  const renderFileTree = (items: FileItem[], level = 0) => {
     // Filtrar solo directorios
     const directories = items.filter((item) => item.directory);
 
     return directories.map((item) => {
+      const isExpanded = expandedFolders.includes(item.fullPath);
+      const hasChildren = item.children && item.children.length > 0;
+
       return (
-        <div key={item.fullPath} className="ml-4">
+        <div key={item.fullPath} className={`ml-${level * 2}`}>
           <div
-            className="flex items-center p-2 cursor-pointer"
+            className={`flex items-center p-1 cursor-pointer rounded-md ${
+              currentPath === item.fullPath
+                ? "bg-blue-100 text-blue-800"
+                : "hover:bg-gray-100"
+            }`}
             onClick={() => toggleFolder(item.fullPath)}
           >
-            <ChevronRight
-              className={`h-4 w-4 mr-1 transition-transform ${
-                expandedFolders.includes(item.fullPath) ? "rotate-90" : ""
-              }`}
-            />
+            {hasChildren ? (
+              <ChevronRight
+                className={`h-4 w-4 mr-1 transition-transform ${
+                  isExpanded ? "rotate-90" : ""
+                }`}
+              />
+            ) : (
+              // Espaciador para alinear items sin hijos, si hay hermanos con hijos
+              <span className="h-4 w-4 mr-1 inline-block"></span>
+            )}
             <Folder className="h-5 w-5 text-amber-500 mr-2" />
-            {/* Al hacer clic en el nombre de la carpeta en el árbol, navegamos a ella */}
             <span
-              className="font-medium hover:underline"
+              className={`font-medium ${
+                currentPath === item.fullPath ? "font-bold" : ""
+              }`}
               onClick={(e) => {
-                e.stopPropagation(); // Evita que se colapse/expanda la carpeta si ya se expandió al hacer clic en el chevron
+                e.stopPropagation(); // Evita que se colapse/expanda la carpeta
                 handleFolderNavigation(item.fullPath);
               }}
             >
               {item.name}
             </span>
           </div>
-          {expandedFolders.includes(item.fullPath) &&
-            item.children.length > 0 && (
-              <div className="ml-4">{renderFileTree(item.children)}</div>
-            )}
+          {isExpanded && hasChildren && (
+            <div className="ml-2">
+              {renderFileTree(item.children, level + 1)}
+            </div>
+          )}
         </div>
       );
     });
@@ -201,7 +232,8 @@ export default function FileExplorer() {
     );
   };
 
-  if (isLoading) {
+  // Manejo de estados de carga y error combinados
+  if (isLoadingContent || isLoadingTree) {
     return (
       <div className="flex justify-center items-center h-screen">
         Cargando archivos...
@@ -209,10 +241,11 @@ export default function FileExplorer() {
     );
   }
 
-  if (isError) {
+  if (isErrorContent || isErrorTree) {
     return (
       <div className="flex justify-center items-center h-screen text-red-500">
-        Error al cargar los archivos: {error?.message}
+        Error al cargar los archivos:{" "}
+        {contentError?.message || treeError?.message}
       </div>
     );
   }
@@ -263,9 +296,14 @@ export default function FileExplorer() {
           } md:block w-60 border-r overflow-y-auto transition-all duration-300`}
         >
           <div className="p-2">
-            {/* Solo pasamos los children del currentPath si existen, para el árbol */}
-            {fileData &&
-              renderFileTree(fileData.filter((item) => item.directory))}
+            {/* Renderizamos el árbol con los datos de rootTreeData */}
+            {rootTreeData && rootTreeData.length > 0
+              ? renderFileTree(rootTreeData)
+              : !isLoadingTree && (
+                  <p className="text-gray-500 text-sm">
+                    No hay carpetas en la raíz.
+                  </p>
+                )}
           </div>
         </div>
 
@@ -286,10 +324,9 @@ export default function FileExplorer() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {fileData?.map((item) => (
+                {currentFolderContent?.map((item) => (
                   <TableRow
                     key={item.fullPath}
-                    // Agrega el cursor-pointer y el evento onClick solo si es un directorio
                     className={
                       item.directory ? "cursor-pointer hover:bg-gray-50" : ""
                     }
