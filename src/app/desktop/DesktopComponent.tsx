@@ -6,6 +6,7 @@ import DesktopFile from "./components/DesktopFile";
 import { useFolderTreeQuery } from "../api/GetFiles/FtpFilesTree";
 import { useRenameMutation } from "../api/GetFiles/FtpRename";
 import { useRouter } from "next/navigation";
+import { useStoreFullPath } from "@/lib/store/StoreUserFullPath";
 
 export default function DesktopComponent() {
   const [notification, setNotification] = useState<string | null>(null);
@@ -15,6 +16,7 @@ export default function DesktopComponent() {
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState<string>("");
   const router = useRouter();
+  const { setUserFullPath } = useStoreFullPath();
 
   const {
     data: files = [],
@@ -54,6 +56,7 @@ export default function DesktopComponent() {
     if (file) {
       setTimeout(() => setNotification(null), 2000);
       if (file.directory) {
+        setUserFullPath(file.fullPath);
         router.push(`/explorer`);
       } else {
         // Aquí puedes manejar la lógica para mostrar el submenú
@@ -120,7 +123,7 @@ export default function DesktopComponent() {
       <div
         className="absolute inset-0 z-0 bg-cover bg-center"
         style={{
-          backgroundImage: "url('/img2.jpg')",
+          backgroundImage: "url('/img3.jpg')",
           opacity: 0.7,
         }}
       />
