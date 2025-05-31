@@ -10,7 +10,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Smartphone } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
 interface FormData {
@@ -23,6 +24,7 @@ interface FormData {
 }
 
 const RegistrationForm = () => {
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -47,21 +49,45 @@ const RegistrationForm = () => {
     console.log(JSON.stringify(formattedData, null, 2));
   };
 
+  const handleBackToUsers = () => {
+    router.back();
+  };
+
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Hero Section */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-slate-900 relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
+      <div
+        className="hidden lg:flex lg:w-1/2 relative overflow-hidden"
+        style={{
+          backgroundImage: "url('/ito1.jpg')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="absolute inset-0 bg-black/50"></div>{" "}
+        {/* Increased opacity */}
         <div className="relative z-10 flex flex-col justify-center items-center p-12 text-white w-full">
-          <div className="mb-8 flex justify-center">
-            <Smartphone className="w-32 h-32 text-white/80" />
+          <div className="absolute top-6 left-6">
+            <Button
+              onClick={handleBackToUsers}
+              className="flex items-center gap-2 bg-blue-800 text-white hover:bg-blue-700 font-medium px-4 py-2 rounded"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Regresar
+            </Button>
           </div>
-          <h2 className="text-3xl font-bold mb-4 text-center w-full">
-            Únete a nuestra plataforma
+          <div className="mb-8 flex justify-center">
+            {/* <Smartphone className="w-32 h-32 text-white/90" />{" "} */}
+            {/* Slightly brighter icon */}
+          </div>
+          <h2 className="text-4xl font-bold mb-4 text-center w-full text-white">
+            Regístra a un nuevo usuario de la Maestría en Sistemas
+            Computacionales
           </h2>
-          <p className="text-lg text-center text-white/80 max-w-md w-full">
-            Crea tu cuenta y accede a todas las funcionalidades de nuestra
-            aplicación
+          <p className="text-lg text-center text-white max-w-md w-full">
+            Forma parte de la comunidad del Instituto Tecnológico de Orizaba y
+            accede a las herramientas necesarias para impulsar tu desarrollo
+            profesional.
           </p>
         </div>
       </div>

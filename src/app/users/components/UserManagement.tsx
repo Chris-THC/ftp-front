@@ -1,6 +1,7 @@
 "use client";
 
 import { useGetAllUserInfo } from "@/app/api/userRequest/GetAllUsers";
+import { LoadingWithText } from "@/app/components/LoadingSpinner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -230,7 +231,7 @@ export default function UserManagement() {
 
         <div className="flex gap-2">
           <Button
-            className="bg-green-500 text-white hover:bg-green-600"
+            className="bg-blue-600 hover:bg-blue-700 text-white "
             onClick={handleGoToCreateNewUser}
           >
             <Plus className="mr-2 h-4 w-4" />
@@ -247,9 +248,11 @@ export default function UserManagement() {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <p className="text-center text-muted-foreground">
-              Cargando usuarios...
-            </p>
+            <div className="flex justify-center items-center h-64">
+              <div className="text-center text-muted-foreground">
+                <LoadingWithText text="Cargando..." size="lg" />
+              </div>
+            </div>
           ) : isError ? (
             <p className="text-center text-red-500">
               Error al cargar usuarios.

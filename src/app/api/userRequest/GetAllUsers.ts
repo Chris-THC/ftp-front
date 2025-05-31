@@ -21,7 +21,6 @@ const fetchUserInformation = async (): Promise<UserInformationResponse[]> => {
   const response = await apiClient.get<UserInformationResponse[]>(
     "/user/information"
   );
-  console.log("User Information Response:", response.data);
   return response.data;
 };
 
