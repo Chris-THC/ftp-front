@@ -43,7 +43,7 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
   finishEditing,
 }) => {
   const ftpDeleteDirectory = useDeleteDirectory();
-  const ftpDeleteFile = useDeleteFileMutation(); // Asumiendo que tienes un hook para eliminar archivos
+  const ftpDeleteFile = useDeleteFileMutation();
 
   const icon = file.directory ? (
     <Folder className="h-10 w-10" fill="#FFB74D" stroke="#F57C00" />
@@ -74,7 +74,6 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
   }, [editingName, editingItemId]);
 
   const handleDownload = async (file: File): Promise<void> => {
-    console.log(`Function not implemented. ${file.fullPath}`);
     try {
       await downloadFile(file.fullPath);
       console.log("Archivo descargado exitosamente");
