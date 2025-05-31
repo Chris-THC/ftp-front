@@ -70,9 +70,11 @@ const RegistrationForm = () => {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12 bg-gray-50">
         <div className="w-full max-w-md">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Register_</h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Registrar a un nuevo usuario
+            </h1>
             <p className="text-gray-600">
-              Completa el formulario para crear tu cuenta
+              Completa el formulario para crear una nueva cuenta
             </p>
           </div>
 
@@ -88,6 +90,7 @@ const RegistrationForm = () => {
                 </Label>
                 <Input
                   id="controlNumber"
+                  autoComplete="off"
                   {...register("controlNumber", {
                     required: "El número de control es requerido",
                   })}
@@ -111,6 +114,7 @@ const RegistrationForm = () => {
                 <Input
                   id="password"
                   type="password"
+                  autoComplete="off"
                   {...register("password", {
                     required: "La contraseña es requerida",
                     minLength: {
@@ -140,6 +144,7 @@ const RegistrationForm = () => {
                 </Label>
                 <Input
                   id="name"
+                  autoComplete="off"
                   {...register("name", { required: "El nombre es requerido" })}
                   placeholder="Nombre"
                   className="h-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
@@ -158,6 +163,7 @@ const RegistrationForm = () => {
                 </Label>
                 <Input
                   id="lastName"
+                  autoComplete="off"
                   {...register("lastName", {
                     required: "El apellido paterno es requerido",
                   })}
@@ -183,6 +189,7 @@ const RegistrationForm = () => {
                 </Label>
                 <Input
                   id="maternalLastName"
+                  autoComplete="off"
                   {...register("maternalLastName", {
                     required: "El apellido materno es requerido",
                   })}
@@ -210,7 +217,7 @@ const RegistrationForm = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="0">Administrador</SelectItem>
-                    <SelectItem value="1">Maestro</SelectItem>
+                    <SelectItem value="1">Docente</SelectItem>
                     <SelectItem value="2">Estudiante</SelectItem>
                   </SelectContent>
                 </Select>
@@ -220,6 +227,12 @@ const RegistrationForm = () => {
                   </p>
                 )}
               </div>
+            </div>
+            <div>
+              <p className="text-sm text-red-600 mt-2 font-semibold">
+                Por favor, no utilices caracteres especiales como acentos o la
+                letra &quot;ñ&quot; para evitar conflictos con el servidor.
+              </p>
             </div>
 
             {/* Buttons */}

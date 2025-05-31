@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 // Función para eliminar un archivo
 export const deleteFile = async (path: string) => {
-  const response = await apiClient.delete("/delete/file", {
+  const response = await apiClient.delete("/ftp/delete/file", {
     data: { path },
   });
   return response.data;

@@ -2,7 +2,7 @@ import apiClient from "../client/ApiClient";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const renameFileOrFolder = async (oldPath: string, newPath: string) => {
-  const response = await apiClient.put("/rename", {
+  const response = await apiClient.put("/ftp/rename", {
     oldPath,
     newPath,
   });

@@ -17,17 +17,19 @@ import {
   File,
   FolderPlus,
   Home,
-  MessageCircle,
-  Search,
+  LogOut,
   Upload,
   User,
+  UserPlus,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useCreateDirectory } from "../api/GetFiles/FtpCreateDirectory";
 import { useUploadFile } from "../api/GetFiles/FtpUploadFile";
 
 const TopBar = () => {
+  const router = useRouter();
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
@@ -73,6 +75,10 @@ const TopBar = () => {
     // Cierra el modal después de crear la carpeta
     setIsFolderModalOpen(false);
     setFolderName(""); // Limpia el input después de crear la carpeta
+  };
+
+  const handleGoUsersScreen = () => {
+    router.push("/users");
   };
 
   return (
@@ -197,21 +203,6 @@ const TopBar = () => {
       {/* DERECHA */}
       <div className="flex items-center gap-2">
         <DropdownMenu
-          open={activeDropdown === "messages"}
-          onOpenChange={(open) => setActiveDropdown(open ? "messages" : null)}
-        >
-          <DropdownMenuTrigger asChild>
-            <button className="p-2 hover:bg-gray-700 rounded-md transition-colors">
-              <MessageCircle className="h-5 w-5" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>No hay mensajes nuevos</DropdownMenuItem>
-            <DropdownMenuItem>Ver todos los mensajes</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <DropdownMenu
           open={activeDropdown === "user"}
           onOpenChange={(open) => setActiveDropdown(open ? "user" : null)}
         >
@@ -221,29 +212,18 @@ const TopBar = () => {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>Perfil</DropdownMenuItem>
-            <DropdownMenuItem>Configuración</DropdownMenuItem>
-            <DropdownMenuItem>Cerrar sesión</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <DropdownMenu
-          open={activeDropdown === "search"}
-          onOpenChange={(open) => setActiveDropdown(open ? "search" : null)}
-        >
-          <DropdownMenuTrigger asChild>
-            <button className="p-2 hover:bg-gray-700 rounded-md transition-colors">
-              <Search className="h-5 w-5" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <div className="p-2">
-              <input
-                type="text"
-                placeholder="Buscar..."
-                className="w-full p-2 text-sm border rounded bg-gray-800 text-white border-gray-700"
-              />
-            </div>
+            <DropdownMenuItem>
+              <User className="w-4 h-4 mr-2" />
+              Perfil
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleGoUsersScreen}>
+              <UserPlus className="w-4 h-4 mr-2" />
+              Registrar nuevo usuario
+            </DropdownMenuItem>
+            <DropdownMenuItem className="text-red-600">
+              <LogOut className="w-4 h-4 mr-2 text-red-600" />
+              Cerrar sesión
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
