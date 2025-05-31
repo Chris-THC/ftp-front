@@ -1,5 +1,6 @@
 "use client";
-
+import toast from "react-hot-toast";
+import { useRegisterUser } from "@/app/api/userRequest/RegisterUser";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,9 +22,12 @@ interface FormData {
   controlNumber: string;
   password: string;
   userRole: number;
+  personalPath: string; // Optional, will be set in the onSubmit function
 }
 
 const RegistrationForm = () => {
+  const createNewUser = useRegisterUser();
+
   const router = useRouter();
   const {
     register,
@@ -38,6 +42,7 @@ const RegistrationForm = () => {
         name: data.name,
         lastName: data.lastName,
         maternalLastName: data.maternalLastName,
+        personalPath: `/home/admin/ftp-data/${data.controlNumber}-${data.name}-${data.lastName}`,
       },
       userForm: {
         controlNumber: data.controlNumber,
@@ -46,11 +51,21 @@ const RegistrationForm = () => {
       },
     };
 
+    createNewUser.mutate(formattedData, {
+      onSuccess: () => {
+        toast.success("Usuario registrado exitosamente.");
+        router.push("/users");
+      },
+      onError: () => {
+        toast.error("Error al registrar el usuario");
+      },
+    });
+
     console.log(JSON.stringify(formattedData, null, 2));
   };
 
   const handleBackToUsers = () => {
-    router.back();
+    router.push("/users");
   };
 
   return (

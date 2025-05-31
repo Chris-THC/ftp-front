@@ -26,7 +26,7 @@ const fetchUserInformation = async (): Promise<UserInformationResponse[]> => {
 
 export const useGetAllUserInfo = () => {
   return useQuery({
-    queryKey: ["userInformation"],
+    queryKey: ["usersInformation"],
     queryFn: fetchUserInformation,
     staleTime: 5 * 60 * 1000, // 5 minutos
     retry: 3,
