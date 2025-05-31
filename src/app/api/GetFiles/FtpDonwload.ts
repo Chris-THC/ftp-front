@@ -3,7 +3,7 @@ import apiClient from "../client/ApiClient";
 const downloadFile = async (path: string) => {
   try {
     const response = await apiClient.post(
-      "/download",
+      "/ftp/download",
       { path },
       {
         responseType: "blob", // Manejar datos binarios

@@ -25,11 +25,12 @@ import {
   MessageSquare,
   MoreVertical,
   Search,
-  User
+  User,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useFolderTreeQuery } from "../api/GetFiles/FtpFilesTree";
 import ActionButtons from "./components/ActionButtons";
+import { LoadingWithText } from "../components/LoadingSpinner";
 
 interface FileItem {
   name: string;
@@ -357,7 +358,7 @@ export default function FileExplorer() {
           <div className="flex-1 overflow-auto">
             {isLoadingContent || isLoadingTree ? (
               <div className="flex justify-center items-center h-full">
-                Cargando archivos...
+                <LoadingWithText text="Cargando..." size="lg" />
               </div>
             ) : isErrorContent || isErrorTree ? (
               <div className="flex justify-center items-center h-full text-red-500">

@@ -11,7 +11,7 @@ interface FolderTreeResponse {
 }
 
 const fetchFolderTree = async (path: string): Promise<FolderTreeResponse[]> => {
-  const response = await apiClient.post<FolderTreeResponse[]>("/folder/tree", {
+  const response = await apiClient.post<FolderTreeResponse[]>("/ftp/folder/tree", {
     path,
   });
   return response.data;
@@ -21,7 +21,7 @@ export const useFolderTreeQuery = (path: string) => {
   return useQuery({
     queryKey: ["folderTree", path],
     queryFn: () => fetchFolderTree(path),
-    staleTime: 5 * 60 * 1000, // 5 minutos
+    staleTime: 5 * 60 * 1000, 
     retry: 3,
   });
 };

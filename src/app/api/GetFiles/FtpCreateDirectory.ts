@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import apiClient from "../client/ApiClient";
 
 export const createDirectory = async (path: string) => {
-  const response = await apiClient.post("/create/directory", {
+  const response = await apiClient.post("/ftp/create/directory", {
     path,
   });
   return response.data;

@@ -11,7 +11,7 @@ const uploadFile = async ({ file, remotePath }: UploadFileParams) => {
   formData.append("file", file);
   formData.append("remotePath", remotePath);
 
-  const response = await apiClient.post("/upload", formData, {
+  const response = await apiClient.post("/ftp/upload", formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
