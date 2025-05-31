@@ -11,7 +11,6 @@ interface RenameModalProps {
 
 export const RenameModal = ({
   isOpen,
-  oldName,
   newName,
   type,
   onChange,
@@ -19,8 +18,6 @@ export const RenameModal = ({
   onSubmit,
 }: RenameModalProps) => {
   if (!isOpen) return null;
-
-  console.log("Renaming:", oldName, "to:", newName);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">

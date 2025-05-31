@@ -37,6 +37,9 @@ import { LoadingWithText } from "../components/LoadingSpinner";
 import { RenameModal } from "./components/ModalRename";
 import { useRenameMutation } from "../api/GetFiles/FtpRename";
 import toast from "react-hot-toast";
+import { useDeleteDirectory } from "../api/GetFiles/FtpDeleteDirectory";
+import { useDeleteFileMutation } from "../api/GetFiles/FtpDeleteFile";
+import downloadFile from "../api/GetFiles/FtpDonwload";
 
 interface FileItem {
   name: string;
@@ -50,6 +53,8 @@ interface FileItem {
 export default function FileExplorer() {
   const { userFullPath } = useStoreFullPath();
   const renameMutation = useRenameMutation();
+  const ftpDeleteDirectory = useDeleteDirectory();
+  const ftpDeleteFile = useDeleteFileMutation();
 
   const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
@@ -61,7 +66,6 @@ export default function FileExplorer() {
   const [newName, setNewName] = useState("");
   const [itemType, setItemType] = useState<"folder" | "file">("file");
 
-  // Consulta para el contenido de la carpeta actual (para la tabla principal)
   const {
     data: currentFolderContent,
     isLoading: isLoadingContent,
@@ -69,14 +73,12 @@ export default function FileExplorer() {
     error: contentError,
   } = useFolderTreeQuery(currentPath);
 
-  // Consulta para el árbol completo desde la raíz (para el sidebar)
-  // ¡Asumimos que tu API devolverá la estructura anidada completa cuando se le pase "/home/admin"!
   const {
     data: rootTreeData,
     isLoading: isLoadingTree,
     isError: isErrorTree,
     error: treeError,
-  } = useFolderTreeQuery(userFullPath); // Esta consulta ya debería devolver solo el contenido accesible al usuario
+  } = useFolderTreeQuery(userFullPath);
 
   const toggleFolder = (folder: string) => {
     if (expandedFolders.includes(folder)) {
@@ -97,8 +99,6 @@ export default function FileExplorer() {
 
   const handleFolderNavigation = (path: string) => {
     setCurrentPath(path);
-    // Expandir la carpeta en el árbol cuando se navega a ella
-    // Asegúrate de que solo se expandan rutas válidas dentro del fullPath del usuario
     const pathSegments = path.split("/").filter(Boolean);
     let currentSegmentPath = "";
     const pathsToExpand = pathSegments.map((segment) => {
@@ -109,8 +109,15 @@ export default function FileExplorer() {
       Array.from(new Set([...prev, ...pathsToExpand]))
     );
   };
+  const handleDownload = async (fullPath: string): Promise<void> => {
+    try {
+      await downloadFile(fullPath);
+      console.log("Archivo descargado exitosamente");
+    } catch (error) {
+      console.error("Error al descargar el archivo:", error);
+    }
+  };
 
-  // Función para construir la ruta de navegación (breadcrumb)
   const renderBreadcrumb = useMemo(() => {
     // 1. Obtener segmentos de la ruta del usuario (su "raíz" permitida)
     const userPathSegments = userFullPath.split("/").filter(Boolean);
@@ -246,7 +253,7 @@ export default function FileExplorer() {
 
   const renderActionsMenu = (item: FileItem) => {
     const handleActionClick = (e: React.MouseEvent, action: () => void) => {
-      e.stopPropagation(); // Evita que se navegue al directorio al hacer clic en las opciones
+      e.stopPropagation();
       action();
     };
 
@@ -285,9 +292,16 @@ export default function FileExplorer() {
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={(e) =>
-                  handleActionClick(e, () =>
-                    console.log("Eliminar carpeta", item.fullPath)
-                  )
+                  handleActionClick(e, () => {
+                    ftpDeleteDirectory.mutate(item.fullPath, {
+                      onSuccess: () => {
+                        toast.success("Carpeta eliminada con éxito.");
+                      },
+                      onError: () => {
+                        toast.error("Error al eliminar la carpeta.");
+                      },
+                    });
+                  })
                 }
               >
                 <Trash className="h-4 w-4 text-red-500 mr-2" />
@@ -311,9 +325,9 @@ export default function FileExplorer() {
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={(e) =>
-                  handleActionClick(e, () =>
-                    console.log("Descargar archivo", item.fullPath)
-                  )
+                  handleActionClick(e, () => {
+                    handleDownload(item.fullPath);
+                  })
                 }
               >
                 <Download className="h-4 w-4 text-green-500 mr-2" />
@@ -321,9 +335,16 @@ export default function FileExplorer() {
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={(e) =>
-                  handleActionClick(e, () =>
-                    console.log("Eliminar archivo", item.fullPath)
-                  )
+                  handleActionClick(e, () => {
+                    ftpDeleteFile.mutate(item.fullPath, {
+                      onSuccess: () => {
+                        toast.success("Archivo eliminado con éxito.");
+                      },
+                      onError: () => {
+                        toast.error("Error al eliminar el archivo.");
+                      },
+                    });
+                  })
                 }
               >
                 <Trash className="h-4 w-4 text-red-500 mr-2" />
@@ -387,9 +408,6 @@ export default function FileExplorer() {
           } md:block w-60 border-r overflow-y-auto transition-all duration-300`}
         >
           <div className="p-2">
-            {/* Renderizamos el árbol con los datos de rootTreeData. 
-                Asegúrate de que rootTreeData solo contenga la estructura de carpetas
-                accesible desde la ruta designada del usuario. */}
             {rootTreeData && rootTreeData.length > 0
               ? renderFileTree(rootTreeData, 0) // Explicitly start level at 0 for proper indentation
               : !isLoadingTree && (
@@ -406,7 +424,7 @@ export default function FileExplorer() {
           {renderBreadcrumb}
 
           {/* Action Buttons */}
-          <ActionButtons />
+          <ActionButtons currentPath={currentPath} />
 
           {/* File List */}
           <div className="flex-1 overflow-auto">
@@ -472,9 +490,6 @@ export default function FileExplorer() {
         onChange={setNewName}
         onClose={() => setIsRenameModalOpen(false)}
         onSubmit={() => {
-          console.log("Nombre anterior:", oldName);
-          console.log("Nuevo nombre:", newName);
-
           const oldPath = `${currentPath}/${oldName}`;
           const newPath = `${currentPath}/${newName}`;
 
