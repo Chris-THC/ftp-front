@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import Image from "next/image";
+import { Smartphone } from "lucide-react";
 import { useForm } from "react-hook-form";
 
 interface FormData {
@@ -50,24 +50,27 @@ const RegistrationForm = () => {
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Hero Section */}
-
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700  relative overflow-hidden">
-        <Image
-          src="/ito2.jpg"
-          alt="Fondo del formulario"
-          layout="fill"
-          objectFit="cover"
-          priority
-        />
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-blue-700 to-slate-900 relative overflow-hidden">
+        <div className="absolute inset-0 bg-black/20"></div>
+        <div className="relative z-10 flex flex-col justify-center items-center p-12 text-white w-full">
+          <div className="mb-8 flex justify-center">
+            <Smartphone className="w-32 h-32 text-white/80" />
+          </div>
+          <h2 className="text-3xl font-bold mb-4 text-center w-full">
+            Únete a nuestra plataforma
+          </h2>
+          <p className="text-lg text-center text-white/80 max-w-md w-full">
+            Crea tu cuenta y accede a todas las funcionalidades de nuestra
+            aplicación
+          </p>
+        </div>
       </div>
 
       {/* Right Side - Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12 bg-gray-50">
         <div className="w-full max-w-md">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Registrar un nuevo usuario
-            </h1>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Register_</h1>
             <p className="text-gray-600">
               Completa el formulario para crear tu cuenta
             </p>
