@@ -42,7 +42,7 @@ const RegistrationForm = () => {
         name: data.name,
         lastName: data.lastName,
         maternalLastName: data.maternalLastName,
-        personalPath: `/home/admin/ftp-data/${data.controlNumber}-${data.name}-${data.lastName}`,
+        personalPath: `/home/admin/ftp-data/${data.controlNumber}-${data.name}`,
       },
       userForm: {
         controlNumber: data.controlNumber,

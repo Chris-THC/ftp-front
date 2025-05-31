@@ -131,7 +131,7 @@ export default function UserManagement() {
         header: "Ruta Personal",
         accessorFn: (row) => row.personalInfo[0]?.personalPath || "N/A",
         cell: ({ row }) => (
-          <div className="text-sm text-muted-foreground font-mono max-w-[200px] truncate">
+          <div className="text-sm text-muted-foreground font-mono max-w-[350px] truncate">
             {row.original.personalInfo[0]?.personalPath || "N/A"}
           </div>
         ),

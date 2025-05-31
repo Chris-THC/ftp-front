@@ -17,6 +17,7 @@ import {
   File,
   FolderPlus,
   Home,
+  ListTodo,
   LogOut,
   Upload,
   User,
@@ -81,11 +82,19 @@ const TopBar = () => {
     router.push("/users");
   };
 
+  const handleGoRegisterNewUser = () => {
+    router.push("/register");
+  };
+
+  const handleGoProfile = () => {
+    router.push("/perfil");
+  };
+
   return (
-    <div className="relative z-10 flex justify-between items-center p-2 bg-[#20252A]/80 text-white">
+    <div className="relative z-10 flex justify-between items-center p-2 h-14 bg-[#1111]/90 text-white">
       {/* IZQUIERDA */}
       <div className="flex items-center gap-2">
-        <button className="p-2 hover:bg-[#20252A]/60 rounded-md transition-colors">
+        <button className="p-2 hover:bg-[#111]/60 rounded-md transition-colors">
           <Home className="h-5 w-5" />
         </button>
 
@@ -212,13 +221,17 @@ const TopBar = () => {
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleGoProfile}>
               <User className="w-4 h-4 mr-2" />
               Perfil
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleGoUsersScreen}>
+            <DropdownMenuItem onClick={handleGoRegisterNewUser}>
               <UserPlus className="w-4 h-4 mr-2" />
               Registrar nuevo usuario
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleGoUsersScreen}>
+              <ListTodo className="w-4 h-4 mr-2" />
+              Gestionar usuarios
             </DropdownMenuItem>
             <DropdownMenuItem className="text-red-600">
               <LogOut className="w-4 h-4 mr-2 text-red-600" />
