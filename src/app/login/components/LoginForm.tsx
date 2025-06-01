@@ -1,5 +1,6 @@
 "use client";
 
+import apiClient from "@/app/api/client/ApiClient";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,7 +11,12 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useStoreNumControlByUser } from "@/lib/store/NumControlByUser";
+import { useStoreFullPath } from "@/lib/store/StoreUserFullPath";
+import { useAuthStore } from "@/store/authStore";
+import { jwtDecode } from "jwt-decode";
 import { Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
 import type React from "react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -27,9 +33,52 @@ const LoginForm: React.FC = () => {
     formState: { errors },
   } = useForm<LoginFormData>();
   const [showPassword, setShowPassword] = useState(false);
+  const { login } = useAuthStore();
+  const router = useRouter();
 
-  const onSubmit = (data: LoginFormData) => {
-    console.log(JSON.stringify(data, null, 2));
+  const { setUserFullPath } = useStoreFullPath();
+  const { setNumControlByUser } = useStoreNumControlByUser();
+
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      const response = await apiClient.post("/ftp/auth/login", data);
+      const { token } = response.data;
+
+      // Decodificar el token para obtener los datos necesarios
+      const decodedToken: {
+        role: string;
+        personalPath: string;
+        controlNum: string;
+      } = jwtDecode(token);
+
+      const { role, personalPath, controlNum } = decodedToken;
+
+      // Establecer el personalPath en el estado global
+      setUserFullPath(personalPath);
+      setNumControlByUser(controlNum);
+
+      // Guardar el token en el estado global y cookies
+      login(token);
+
+      // Redirigir según el rol
+      switch (role) {
+        case "Admin":
+          router.push("/");
+          break;
+        case "Professor":
+          router.push("/");
+          break;
+        case "Student":
+          router.push("/explorer");
+          break;
+        default:
+          console.error("Rol desconocido:", role);
+          alert("Rol desconocido");
+      }
+    } catch (error) {
+      console.error("Error en el login:", error);
+      alert("Credenciales inválidas");
+    }
   };
 
   return (

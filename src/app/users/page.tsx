@@ -1,12 +1,13 @@
 import { Toaster } from "react-hot-toast";
 import UserManagementTable from "./components/UserManagementTable";
+import ProtectedRoute from "@/auth/ProtectedRoute";
 
 const Page = () => {
   return (
-    <div>
+    <ProtectedRoute allowedRoles={["Admin"]}>
       <UserManagementTable />
       <Toaster position="top-right" reverseOrder={false} />
-    </div>
+    </ProtectedRoute>
   );
 };
 
