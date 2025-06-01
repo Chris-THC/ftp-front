@@ -173,11 +173,18 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ currentPath }) => {
           <DialogFooter className="flex justify-end gap-2 mt-4">
             <Button
               variant="outline"
+              className="bg-red-600 text-white"
               onClick={() => setIsFolderModalOpen(false)}
             >
               Cancelar
             </Button>
-            <Button onClick={handleCreateFolder}>Crear</Button>
+            <Button
+              variant="outline"
+              className="bg-blue-600 text-white"
+              onClick={handleCreateFolder}
+            >
+              Crear
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

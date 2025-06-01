@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/store/authStore";
 import {
   File,
+  Folder,
   FolderPlus,
   Home,
   ListTodo,
@@ -97,6 +98,10 @@ const TopBar = () => {
   const handleLogout = () => {
     logout();
     router.push("/login");
+  };
+
+  const handleGoExplorer = () => {
+    router.push("/explorer");
   };
 
   return (
@@ -233,6 +238,10 @@ const TopBar = () => {
             <DropdownMenuItem onClick={handleGoProfile}>
               <User className="w-4 h-4 mr-2" />
               Perfil
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleGoExplorer}>
+              <Folder className="w-4 h-4 mr-2" />
+              Archivos
             </DropdownMenuItem>
             {user?.role === "Admin" && (
               <>

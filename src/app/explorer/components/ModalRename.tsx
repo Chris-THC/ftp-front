@@ -37,7 +37,7 @@ export const RenameModal = ({
           >
             Renombrar
           </button>
-          <button onClick={onClose} className="px-4 py-2 border rounded">
+          <button onClick={onClose} className="px-4 py-2 border rounded bg-red-600 text-white">
             Cancelar
           </button>
         </div>
