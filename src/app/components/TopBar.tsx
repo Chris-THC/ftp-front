@@ -31,10 +31,12 @@ import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useCreateDirectory } from "../api/GetFiles/FtpCreateDirectory";
 import { useUploadFile } from "../api/GetFiles/FtpUploadFile";
+import { useStoreNumControlByUser } from "@/lib/store/NumControlByUser";
 
 const TopBar = () => {
   const router = useRouter();
   const { user, logout } = useAuthStore();
+  const { setNumControlByUser } = useStoreNumControlByUser();
 
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
@@ -92,6 +94,7 @@ const TopBar = () => {
   };
 
   const handleGoProfile = () => {
+    setNumControlByUser(user!.controlNum);
     router.push("/perfil");
   };
 

@@ -5,6 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useStoreNumControlByUser } from "@/lib/store/NumControlByUser";
 import { useAuthStore } from "@/store/authStore";
 import { Folder, Home, ListTodo, LogOut, User, UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -12,6 +13,7 @@ import { useState } from "react";
 
 const TopBarOtherScreens = () => {
   const router = useRouter();
+  const { setNumControlByUser } = useStoreNumControlByUser();
   const { user, logout } = useAuthStore();
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
@@ -24,6 +26,7 @@ const TopBarOtherScreens = () => {
   };
 
   const handleGoProfile = () => {
+    setNumControlByUser(user!.controlNum);
     router.push("/perfil");
   };
 
