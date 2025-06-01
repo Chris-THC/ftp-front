@@ -16,13 +16,13 @@ export default function DesktopComponent() {
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState<string>("");
   const router = useRouter();
-  const { setUserFullPath } = useStoreFullPath();
+  const { setUserFullPath, userFullPath } = useStoreFullPath();
 
   const {
     data: files = [],
     isLoading,
     isError,
-  } = useFolderTreeQuery("/home/admin");
+  } = useFolderTreeQuery(userFullPath);
 
   const renameMutation = useRenameMutation();
 

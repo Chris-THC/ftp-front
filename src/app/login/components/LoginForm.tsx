@@ -37,7 +37,7 @@ const LoginForm: React.FC = () => {
   const router = useRouter();
 
   const { setUserFullPath } = useStoreFullPath();
-  const { setNumControlByUser } = useStoreNumControlByUser();
+  const { setNumControlByUser, setPerfilNumControl } = useStoreNumControlByUser();
 
   const onSubmit = async (data: LoginFormData) => {
     try {
@@ -56,6 +56,7 @@ const LoginForm: React.FC = () => {
       // Establecer el personalPath en el estado global
       setUserFullPath(personalPath);
       setNumControlByUser(controlNum);
+      setPerfilNumControl(controlNum);
 
       // Guardar el token en el estado global y cookies
       login(token);

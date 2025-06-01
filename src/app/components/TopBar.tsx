@@ -28,13 +28,18 @@ import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useCreateDirectory } from "../api/GetFiles/FtpCreateDirectory";
 import { useUploadFile } from "../api/GetFiles/FtpUploadFile";
+import { useStoreNumControlByUser } from "@/lib/store/NumControlByUser";
+import { useStoreFullPath } from "@/lib/store/StoreUserFullPath";
 
 const TopBar = () => {
   const router = useRouter();
+  const { userFullPath } = useStoreFullPath();
+
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const { perfilNumControl, setNumControlByUser } = useStoreNumControlByUser();
 
   const createDirectory = useCreateDirectory();
   const uploadFile = useUploadFile();
@@ -47,7 +52,7 @@ const TopBar = () => {
     const file = e.target.files?.[0];
     if (file) {
       uploadFile.mutate(
-        { file, remotePath: "/home/admin" },
+        { file, remotePath: userFullPath },
         {
           onSuccess: () => {
             toast.success("Archivo subido exitosamente");
@@ -63,7 +68,7 @@ const TopBar = () => {
 
   // Función para manejar la creación de la carpeta
   const handleCreateFolder = () => {
-    const directoryPath = `/home/admin/${folderName}`;
+    const directoryPath = `${userFullPath}/${folderName}`;
 
     createDirectory.mutate(directoryPath, {
       onSuccess: () => {
@@ -87,6 +92,7 @@ const TopBar = () => {
   };
 
   const handleGoProfile = () => {
+    setNumControlByUser(perfilNumControl);
     router.push("/perfil");
   };
 

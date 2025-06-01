@@ -24,7 +24,7 @@ apiClient.interceptors.response.use(
     if (error.response.status === 401) {
       Cookies.remove("token");
       Cookies.remove("role");
-      window.location.href = "/login"; // Redirige al login si el token caduca
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   }
