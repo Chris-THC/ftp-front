@@ -17,15 +17,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useUpdateUserPasswordMutation } from "@/app/api/userRequest/UpdatePassword";
+import { useStoreNumControlByUser } from "@/lib/store/NumControlByUser";
 
 export default function PerfilUser() {
   const router = useRouter();
+  const { numControlByUser } = useStoreNumControlByUser();
 
   const {
     data: userData,
     isLoading,
     isError,
-  } = useGetUserByControlNumber("19011297");
+  } = useGetUserByControlNumber(numControlByUser);
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -77,7 +79,7 @@ export default function PerfilUser() {
   };
 
   const handleNavigateToExplore = () => {
-    router.push("/explorer");
+    router.back();
   };
 
   const personalInfo = userData?.personalInfo[0];
@@ -111,7 +113,7 @@ export default function PerfilUser() {
   return (
     <div className="container mx-auto py-10 px-4 max-w-3xl">
       <div className="flex justify-between items-start mb-6">
-        <Button variant="outline" onClick={() => router.push("/explorer")}>
+        <Button variant="outline" onClick={handleNavigateToExplore}>
           Regresar
         </Button>
       </div>
@@ -144,7 +146,11 @@ export default function PerfilUser() {
                 Carpeta Asignada
               </Label>
               <p className="font-medium text-sm break-all">
-                /{personalInfo?.personalPath.split("/ftp-data/")[1] || "N/A"}
+                {userData?.userRole === "Admin"
+                  ? personalInfo?.personalPath || " "
+                  : `/${
+                      personalInfo?.personalPath.split("/ftp-data/")[1] || ""
+                    }`}
               </p>
             </div>
           </div>
