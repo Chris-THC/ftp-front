@@ -24,11 +24,8 @@ import {
   Folder,
   Home,
   Menu,
-  MessageSquare,
   MoreVertical,
-  Search,
   Trash,
-  User,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
@@ -90,11 +87,6 @@ export default function FileExplorer() {
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
-  };
-
-  const handleGoHome = () => {
-    // Aqui se apllicara la logica cuando se aplique los roles del usuario
-    console.log("Ir a la carpeta raíz del usuario");
   };
 
   const handleFolderNavigation = (path: string) => {
@@ -359,46 +351,6 @@ export default function FileExplorer() {
 
   return (
     <div className="flex flex-col h-screen bg-white">
-      {/* Top Navigation Bar */}
-      <div className="flex justify-between items-center bg-black text-white h-10 px-2">
-        <div className="flex space-x-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-white md:hidden"
-            onClick={toggleSidebar}
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-          <Button
-            onClick={handleGoHome}
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-white"
-          >
-            <Home className="h-5 w-5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 bg-amber-500 text-white"
-          >
-            <Folder className="h-5 w-5" />
-          </Button>
-        </div>
-        <div className="flex space-x-2">
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-white">
-            <MessageSquare className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-white">
-            <User className="h-5 w-5" />
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8 text-white">
-            <Search className="h-5 w-5" />
-          </Button>
-        </div>
-      </div>
-
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left Sidebar */}
@@ -417,7 +369,14 @@ export default function FileExplorer() {
                 )}
           </div>
         </div>
-
+        <Button
+          variant="outline"
+          size="icon"
+          className="h-9 w-9 text-black md:hidden"
+          onClick={toggleSidebar}
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
         {/* Right Content Area */}
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Breadcrumb / Ruta de navegación */}

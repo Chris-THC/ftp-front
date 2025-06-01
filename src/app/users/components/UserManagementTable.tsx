@@ -39,6 +39,9 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useDeleteDirectory } from "@/app/api/GetFiles/FtpDeleteDirectory";
+import toast from "react-hot-toast";
+import { useDeleteUserById } from "@/app/api/userRequest/DeleteUser";
 
 interface PersonalInfo {
   idPerInfo: number;
@@ -58,6 +61,8 @@ interface User {
 
 export default function UserManagementTable() {
   const router = useRouter();
+  const ftpDeleteDirectory = useDeleteDirectory();
+  const deleteUser = useDeleteUserById();
   const { data: users, isLoading, isError } = useGetAllUserInfo();
   const { setNumControlByUser } = useStoreNumControlByUser();
 
@@ -101,6 +106,26 @@ export default function UserManagementTable() {
 
   const handleRegisterNewUser = () => {
     router.push("/register");
+  };
+
+  const handleDeleteUser = (user: User) => {
+    ftpDeleteDirectory.mutate(user.personalInfo[0].personalPath, {
+      onSuccess: () => {
+        deleteUser.mutate(user.idUser, {
+          onSuccess: () => {
+            toast.success("Usuario eliminado con éxito.");
+          },
+          onError: () => {
+            toast.error("Error al eliminar el usuario.");
+          },
+        });
+      },
+      onError: () => {
+        toast.error(
+          "Error al eliminar la carpeta en el servidor FTP, por favor intenta de nuevo."
+        );
+      },
+    });
   };
 
   if (isLoading) {
@@ -258,14 +283,7 @@ export default function UserManagementTable() {
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 className="text-red-600"
-                                onClick={() => {
-                                  console.log(
-                                    "Eliminar usuario: " +
-                                      personalInfo.name +
-                                      " " +
-                                      personalInfo.lastName
-                                  );
-                                }}
+                                onClick={() => handleDeleteUser(user)}
                               >
                                 <Trash2 className="mr-2 h-4 w-4" />
                                 Eliminar

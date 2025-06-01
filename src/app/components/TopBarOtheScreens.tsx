@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,7 +6,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useAuthStore } from "@/store/authStore";
-import { Home, ListTodo, LogOut, User, UserPlus } from "lucide-react";
+import { Folder, Home, ListTodo, LogOut, User, UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -33,6 +33,10 @@ const TopBarOtherScreens = () => {
   };
   const handleGoHome = () => {
     router.push("/");
+  };
+
+  const handleGoExplorer = () => {
+    router.push("/explorer");
   };
 
   return (
@@ -62,6 +66,10 @@ const TopBarOtherScreens = () => {
             <DropdownMenuItem onClick={handleGoProfile}>
               <User className="w-4 h-4 mr-2" />
               Perfil
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={handleGoExplorer}>
+              <Folder className="w-4 h-4 mr-2" />
+              Archivos
             </DropdownMenuItem>
             {user?.role === "Admin" && (
               <>
