@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useStoreFullPath } from "@/lib/store/StoreUserFullPath";
+import { useAuthStore } from "@/store/authStore";
 import {
   ChevronRight,
   Download,
@@ -31,15 +31,15 @@ import {
   User,
 } from "lucide-react";
 import { useMemo, useState } from "react";
-import { useFolderTreeQuery } from "../api/GetFiles/FtpFilesTree";
-import ActionButtons from "./components/ActionButtons";
-import { LoadingWithText } from "../components/LoadingSpinner";
-import { RenameModal } from "./components/ModalRename";
-import { useRenameMutation } from "../api/GetFiles/FtpRename";
 import toast from "react-hot-toast";
 import { useDeleteDirectory } from "../api/GetFiles/FtpDeleteDirectory";
 import { useDeleteFileMutation } from "../api/GetFiles/FtpDeleteFile";
 import downloadFile from "../api/GetFiles/FtpDonwload";
+import { useFolderTreeQuery } from "../api/GetFiles/FtpFilesTree";
+import { useRenameMutation } from "../api/GetFiles/FtpRename";
+import { LoadingWithText } from "../components/LoadingSpinner";
+import ActionButtons from "./components/ActionButtons";
+import { RenameModal } from "./components/ModalRename";
 
 interface FileItem {
   name: string;
@@ -51,14 +51,14 @@ interface FileItem {
 }
 
 export default function FileExplorer() {
-  const { userFullPath } = useStoreFullPath();
   const renameMutation = useRenameMutation();
   const ftpDeleteDirectory = useDeleteDirectory();
   const ftpDeleteFile = useDeleteFileMutation();
+  const { user } = useAuthStore();
 
   const [expandedFolders, setExpandedFolders] = useState<string[]>([]);
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
-  const [currentPath, setCurrentPath] = useState<string>(userFullPath);
+  const [currentPath, setCurrentPath] = useState<string>(user!.personalPath);
 
   // Modal para renombrar archivos o carpetas
   const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
@@ -78,7 +78,7 @@ export default function FileExplorer() {
     isLoading: isLoadingTree,
     isError: isErrorTree,
     error: treeError,
-  } = useFolderTreeQuery(userFullPath);
+  } = useFolderTreeQuery(user!.personalPath);
 
   const toggleFolder = (folder: string) => {
     if (expandedFolders.includes(folder)) {
@@ -120,12 +120,12 @@ export default function FileExplorer() {
 
   const renderBreadcrumb = useMemo(() => {
     // 1. Obtener segmentos de la ruta del usuario (su "raíz" permitida)
-    const userPathSegments = userFullPath.split("/").filter(Boolean);
+    const userPathSegments = user!.personalPath.split("/").filter(Boolean);
     // 2. Obtener segmentos de la ruta actual
     const currentPathSegments = currentPath.split("/").filter(Boolean);
 
     // 3. Encontrar el punto de inicio para los segmentos a mostrar en el breadcrumb.
-    // Esto asegura que no mostremos "home", "admin" si el userFullPath ya los contiene.
+    // Esto asegura que no mostremos "home", "admin" si el user!.personalPath ya los contiene.
     let startIndex = 0;
     for (let i = 0; i < userPathSegments.length; i++) {
       if (userPathSegments[i] === currentPathSegments[i]) {
@@ -135,12 +135,12 @@ export default function FileExplorer() {
       }
     }
 
-    // 4. Los segmentos a "mostrar" en el breadcrumb serán solo los que están después del userFullPath.
+    // 4. Los segmentos a "mostrar" en el breadcrumb serán solo los que están después del user!.personalPath.
     const displaySegments = currentPathSegments.slice(startIndex);
 
     // 5. Inicializar el acumulador de ruta con la ruta completa del usuario.
     // Esto es crucial para construir enlaces de navegación válidos desde la "raíz" del usuario.
-    let pathAccumulator = userFullPath;
+    let pathAccumulator = user!.personalPath;
 
     return (
       <div className="flex items-center space-x-1 text-sm text-gray-600 px-4 py-2 bg-gray-50 border-b">
@@ -149,7 +149,7 @@ export default function FileExplorer() {
           variant="ghost"
           size="icon"
           className="h-6 w-6 text-gray-500"
-          onClick={() => handleFolderNavigation(userFullPath)}
+          onClick={() => handleFolderNavigation(user!.personalPath)}
           title="Ir a mi carpeta raíz"
         >
           <Home className="h-4 w-4" />
@@ -162,7 +162,7 @@ export default function FileExplorer() {
             <Button
               variant="link"
               className="p-0 h-auto text-gray-600 hover:text-blue-600"
-              onClick={() => handleFolderNavigation(userFullPath)}
+              onClick={() => handleFolderNavigation(user!.personalPath)}
             >
               {userPathSegments[userPathSegments.length - 1]}
             </Button>
@@ -197,7 +197,7 @@ export default function FileExplorer() {
         })}
       </div>
     );
-  }, [currentPath, userFullPath]);
+  }, [currentPath, user!.personalPath]);
 
   // Esta función ahora renderiza el árbol completo desde la raíz
   const renderFileTree = (items: FileItem[], level = 0) => {

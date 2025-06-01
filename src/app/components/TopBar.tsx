@@ -1,3 +1,4 @@
+'use client';
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { useAuthStore } from "@/store/authStore";
 import {
   File,
   FolderPlus,
@@ -31,6 +33,8 @@ import { useUploadFile } from "../api/GetFiles/FtpUploadFile";
 
 const TopBar = () => {
   const router = useRouter();
+  const { user, logout } = useAuthStore();
+
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
@@ -47,7 +51,7 @@ const TopBar = () => {
     const file = e.target.files?.[0];
     if (file) {
       uploadFile.mutate(
-        { file, remotePath: "/home/admin" },
+        { file, remotePath: user!.personalPath },
         {
           onSuccess: () => {
             toast.success("Archivo subido exitosamente");
@@ -63,7 +67,7 @@ const TopBar = () => {
 
   // Función para manejar la creación de la carpeta
   const handleCreateFolder = () => {
-    const directoryPath = `/home/admin/${folderName}`;
+    const directoryPath = `${user!.personalPath}/${folderName}`;
 
     createDirectory.mutate(directoryPath, {
       onSuccess: () => {
@@ -88,6 +92,11 @@ const TopBar = () => {
 
   const handleGoProfile = () => {
     router.push("/perfil");
+  };
+
+  const handleLogout = () => {
+    logout();
+    router.push("/login");
   };
 
   return (
@@ -225,15 +234,19 @@ const TopBar = () => {
               <User className="w-4 h-4 mr-2" />
               Perfil
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleGoRegisterNewUser}>
-              <UserPlus className="w-4 h-4 mr-2" />
-              Registrar nuevo usuario
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleGoUsersScreen}>
-              <ListTodo className="w-4 h-4 mr-2" />
-              Gestionar usuarios
-            </DropdownMenuItem>
-            <DropdownMenuItem className="text-red-600">
+            {user?.role === "Admin" && (
+              <>
+                <DropdownMenuItem onClick={handleGoRegisterNewUser}>
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Registrar nuevo usuario
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleGoUsersScreen}>
+                  <ListTodo className="w-4 h-4 mr-2" />
+                  Gestionar usuarios
+                </DropdownMenuItem>
+              </>
+            )}
+            <DropdownMenuItem onClick={handleLogout} className="text-red-600">
               <LogOut className="w-4 h-4 mr-2 text-red-600" />
               Cerrar sesión
             </DropdownMenuItem>

@@ -1,9 +1,6 @@
 "use client";
-import { AlertCircle, Eye, EyeOff } from "lucide-react";
-import { useRouter } from "next/navigation";
-import type React from "react";
-import { useState } from "react";
 import { useGetUserByControlNumber } from "@/app/api/userRequest/GetUserByNumControl";
+import { useUpdateUserPasswordMutation } from "@/app/api/userRequest/UpdatePassword";
 import { LoadingWithText } from "@/app/components/LoadingSpinner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -16,18 +13,20 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useUpdateUserPasswordMutation } from "@/app/api/userRequest/UpdatePassword";
-import { useStoreNumControlByUser } from "@/lib/store/NumControlByUser";
+import { useAuthStore } from "@/store/authStore";
+import { AlertCircle, Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
+import type React from "react";
+import { useState } from "react";
 
 export default function PerfilUser() {
   const router = useRouter();
-  const { numControlByUser } = useStoreNumControlByUser();
-
+  const { user } = useAuthStore();
   const {
     data: userData,
     isLoading,
     isError,
-  } = useGetUserByControlNumber(numControlByUser);
+  } = useGetUserByControlNumber(user!.controlNum);
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
