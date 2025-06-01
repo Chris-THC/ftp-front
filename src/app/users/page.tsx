@@ -1,11 +1,10 @@
-import React from "react";
-import UserManagement from "./components/UserManagement";
 import { Toaster } from "react-hot-toast";
+import UserManagementTable from "./components/UserManagementTable";
 
 const Page = () => {
   return (
     <div>
-      <UserManagement />
+      <UserManagementTable />
       <Toaster position="top-right" reverseOrder={false} />
     </div>
   );
