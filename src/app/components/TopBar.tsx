@@ -1,3 +1,4 @@
+'use client';
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -233,14 +234,18 @@ const TopBar = () => {
               <User className="w-4 h-4 mr-2" />
               Perfil
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleGoRegisterNewUser}>
-              <UserPlus className="w-4 h-4 mr-2" />
-              Registrar nuevo usuario
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleGoUsersScreen}>
-              <ListTodo className="w-4 h-4 mr-2" />
-              Gestionar usuarios
-            </DropdownMenuItem>
+            {user?.role === "Admin" && (
+              <>
+                <DropdownMenuItem onClick={handleGoRegisterNewUser}>
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  Registrar nuevo usuario
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleGoUsersScreen}>
+                  <ListTodo className="w-4 h-4 mr-2" />
+                  Gestionar usuarios
+                </DropdownMenuItem>
+              </>
+            )}
             <DropdownMenuItem onClick={handleLogout} className="text-red-600">
               <LogOut className="w-4 h-4 mr-2 text-red-600" />
               Cerrar sesión

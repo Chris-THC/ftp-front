@@ -20,6 +20,7 @@ import { useRouter } from "next/navigation";
 import type React from "react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import toast, { Toaster } from "react-hot-toast";
 
 interface LoginFormData {
   numControl: string;
@@ -74,11 +75,11 @@ const LoginForm: React.FC = () => {
           break;
         default:
           console.error("Rol desconocido:", role);
-          alert("Rol desconocido");
+          toast.error("Rol desconocido");
       }
     } catch (error) {
+      toast.error("Credenciales inválidas");
       console.error("Error en el login:", error);
-      alert("Credenciales inválidas");
     }
   };
 
@@ -192,6 +193,7 @@ const LoginForm: React.FC = () => {
           </CardContent>
         </Card>
       </div>
+      <Toaster position="top-center" reverseOrder={false} />
     </div>
   );
 };

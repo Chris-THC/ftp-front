@@ -2,7 +2,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 
 const apiClient = axios.create({
-  baseURL: "http://192.168.1.66:8081/",
+  baseURL: "http://192.168.1.65:8081/",
   headers: {
     "Content-Type": "application/json",
   },
