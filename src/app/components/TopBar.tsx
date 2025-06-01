@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { useAuthStore } from "@/store/authStore";
 import {
   File,
   FolderPlus,
@@ -28,18 +29,15 @@ import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useCreateDirectory } from "../api/GetFiles/FtpCreateDirectory";
 import { useUploadFile } from "../api/GetFiles/FtpUploadFile";
-import { useStoreNumControlByUser } from "@/lib/store/NumControlByUser";
-import { useStoreFullPath } from "@/lib/store/StoreUserFullPath";
 
 const TopBar = () => {
   const router = useRouter();
-  const { userFullPath } = useStoreFullPath();
+  const { user, logout } = useAuthStore();
 
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
   const [folderName, setFolderName] = useState("");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const { perfilNumControl, setNumControlByUser } = useStoreNumControlByUser();
 
   const createDirectory = useCreateDirectory();
   const uploadFile = useUploadFile();
@@ -52,7 +50,7 @@ const TopBar = () => {
     const file = e.target.files?.[0];
     if (file) {
       uploadFile.mutate(
-        { file, remotePath: userFullPath },
+        { file, remotePath: user!.personalPath },
         {
           onSuccess: () => {
             toast.success("Archivo subido exitosamente");
@@ -68,7 +66,7 @@ const TopBar = () => {
 
   // Función para manejar la creación de la carpeta
   const handleCreateFolder = () => {
-    const directoryPath = `${userFullPath}/${folderName}`;
+    const directoryPath = `${user!.personalPath}/${folderName}`;
 
     createDirectory.mutate(directoryPath, {
       onSuccess: () => {
@@ -92,8 +90,12 @@ const TopBar = () => {
   };
 
   const handleGoProfile = () => {
-    setNumControlByUser(perfilNumControl);
     router.push("/perfil");
+  };
+
+  const handleLogout = () => {
+    logout();
+    router.push("/login");
   };
 
   return (
@@ -239,7 +241,7 @@ const TopBar = () => {
               <ListTodo className="w-4 h-4 mr-2" />
               Gestionar usuarios
             </DropdownMenuItem>
-            <DropdownMenuItem className="text-red-600">
+            <DropdownMenuItem onClick={handleLogout} className="text-red-600">
               <LogOut className="w-4 h-4 mr-2 text-red-600" />
               Cerrar sesión
             </DropdownMenuItem>

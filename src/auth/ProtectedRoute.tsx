@@ -1,7 +1,7 @@
 "use client";
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -14,17 +14,24 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 }) => {
   const { user } = useAuthStore();
   const router = useRouter();
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    if (!user) {
-      router.push("/login");
-    } else if (!allowedRoles.includes(user.role)) {
-      router.push("/explorer");
-    }
-  }, [user, router, allowedRoles]);
+    setHydrated(true); // Esperar a que Zustand hidrate
+  }, []);
 
-  if (!user || !allowedRoles.includes(user.role)) {
-    return null; // Evita renderizar contenido mientras redirige
+  useEffect(() => {
+    if (hydrated) {
+      if (!user) {
+        router.push("/login");
+      } else if (!allowedRoles.includes(user.role)) {
+        router.push("/explorer");
+      }
+    }
+  }, [hydrated, user, router, allowedRoles]);
+
+  if (!hydrated || !user || !allowedRoles.includes(user.role)) {
+    return null;
   }
 
   return <>{children}</>;

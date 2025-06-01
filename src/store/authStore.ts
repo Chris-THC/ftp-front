@@ -1,26 +1,3 @@
-// import { create } from "zustand";
-// import Cookies from "js-cookie";
-
-// interface AuthState {
-//   user: { role: string; token: string } | null;
-//   login: (token: string, role: string) => void;
-//   logout: () => void;
-// }
-
-// export const useAuthStore = create<AuthState>((set) => ({
-//   user: null,
-//   login: (token, role) => {
-//     Cookies.set("token", token, { secure: true, sameSite: "strict" });
-//     Cookies.set("role", role, { secure: true, sameSite: "strict" });
-//     set({ user: { token, role } });
-//   },
-//   logout: () => {
-//     Cookies.remove("token");
-//     Cookies.remove("role");
-//     set({ user: null });
-//   },
-// }));
-
 import { create } from "zustand";
 import Cookies from "js-cookie";
 import { jwtDecode } from "jwt-decode";
@@ -29,37 +6,85 @@ interface UserData {
   role: string;
   token: string;
   personalPath: string;
-  // Puedes agregar más campos del token aquí si los necesitas
+  controlNum: string;
+  exp: number; // Agregado para validar expiración
 }
 
 interface AuthState {
   user: UserData | null;
-  login: (token: string) => void; // Cambiamos para recibir solo el token
+  login: (token: string) => void;
   logout: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  user: null,
-  login: (token) => {
-    // Decodificar el token para extraer la información
-    const decoded = jwtDecode<{
-      role: string;
-      personalPath: string;
-      // otras propiedades del token...
-    }>(token);
+const isTokenExpired = (exp: number) => {
+  const now = Math.floor(Date.now() / 1000); // tiempo actual en segundos
+  return exp < now;
+};
 
-    // Guardar en cookies y estado
-    Cookies.set("token", token, { secure: true, sameSite: "strict" });
-    set({
-      user: {
+export const useAuthStore = create<AuthState>((set) => {
+  // Cargar y validar desde las cookies
+  const storedToken = Cookies.get("token");
+  let initialUser: UserData | null = null;
+
+  if (storedToken) {
+    try {
+      const decoded = jwtDecode<{
+        role: string;
+        personalPath: string;
+        controlNum: string;
+        exp: number;
+      }>(storedToken);
+
+      if (isTokenExpired(decoded.exp)) {
+        // Token expirado, limpiar todo
+        Cookies.remove("token");
+      } else {
+        initialUser = {
+          token: storedToken,
+          role: decoded.role,
+          personalPath: decoded.personalPath,
+          controlNum: decoded.controlNum,
+          exp: decoded.exp,
+        };
+      }
+    } catch (err) {
+      console.error("Error al decodificar el token:", err);
+      Cookies.remove("token");
+    }
+  }
+
+  return {
+    user: initialUser,
+    login: (token) => {
+      const decoded = jwtDecode<{
+        role: string;
+        personalPath: string;
+        controlNum: string;
+        exp: number;
+      }>(token);
+
+      const userData: UserData = {
         token,
         role: decoded.role,
         personalPath: decoded.personalPath,
-      },
-    });
-  },
-  logout: () => {
-    Cookies.remove("token");
-    set({ user: null });
-  },
-}));
+        controlNum: decoded.controlNum,
+        exp: decoded.exp,
+      };
+
+      // Guardar token en cookie persistente (opcionalmente hasta que expire)
+      const expireDays = Math.ceil((decoded.exp - Date.now() / 1000) / 86400);
+      Cookies.set("token", token, {
+        secure: true,
+        sameSite: "strict",
+        expires: expireDays,
+      });
+
+      // Guardar en Zustand
+      set({ user: userData });
+    },
+    logout: () => {
+      Cookies.remove("token");
+      set({ user: null });
+    },
+  };
+});

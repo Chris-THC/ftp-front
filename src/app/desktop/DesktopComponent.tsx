@@ -1,28 +1,26 @@
 "use client";
-
+import { useAuthStore } from "@/store/authStore";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import TopBar from "../components/TopBar";
-import DesktopFile from "./components/DesktopFile";
 import { useFolderTreeQuery } from "../api/GetFiles/FtpFilesTree";
 import { useRenameMutation } from "../api/GetFiles/FtpRename";
-import { useRouter } from "next/navigation";
-import { useStoreFullPath } from "@/lib/store/StoreUserFullPath";
+import TopBar from "../components/TopBar";
+import DesktopFile from "./components/DesktopFile";
 
 export default function DesktopComponent() {
   const [notification, setNotification] = useState<string | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-
   const [editingItemId, setEditingItemId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState<string>("");
   const router = useRouter();
-  const { setUserFullPath, userFullPath } = useStoreFullPath();
+  const { user } = useAuthStore();
 
   const {
     data: files = [],
     isLoading,
     isError,
-  } = useFolderTreeQuery(userFullPath);
+  } = useFolderTreeQuery(user?.personalPath || "");
 
   const renameMutation = useRenameMutation();
 
@@ -56,7 +54,7 @@ export default function DesktopComponent() {
     if (file) {
       setTimeout(() => setNotification(null), 2000);
       if (file.directory) {
-        setUserFullPath(file.fullPath);
+        // setUserFullPath(file.fullPath);
         router.push(`/explorer`);
       } else {
         // Aquí puedes manejar la lógica para mostrar el submenú

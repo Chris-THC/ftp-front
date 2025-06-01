@@ -74,7 +74,7 @@ const RegistrationForm = () => {
       <div
         className="hidden lg:flex lg:w-1/2 relative overflow-hidden"
         style={{
-          backgroundImage: "url('/ito1.jpg')",
+          backgroundImage: "url('/ito4.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
