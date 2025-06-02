@@ -39,12 +39,6 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
 }) => {
   const ftpDeleteDirectory = useDeleteDirectory();
   const ftpDeleteFile = useDeleteFileMutation();
-
-  // const icon = file.directory ? (
-  //   <Folder className="h-10 w-10" fill="#FFB74D" stroke="#F57C00" />
-  // ) : (
-  //   <FileIcon className="h-10 w-10" />
-  // );
   const icon = getFileIcon({
     name: file.name,
     isDirectory: file.directory,
@@ -71,7 +65,7 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
       textarea.style.height = "auto";
       textarea.style.height = textarea.scrollHeight + "px";
     }
-  }, [editingName, editingItemId]);
+  }, [editingName, editingItemId, file.fullPath, inputRef]);
 
   const handleDownload = async (file: File): Promise<void> => {
     try {
