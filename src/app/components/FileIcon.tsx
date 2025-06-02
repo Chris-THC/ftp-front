@@ -30,8 +30,9 @@ export const getFileIcon = ({
 
   const iconMap: { [key: string]: JSX.Element } = {
     pdf: <FaRegFilePdf className={`text-red-500 ${className}`} />,
-    docx: <BsFiletypeDocx className={`text-blue-600 ${className}`} />,
+    docx: <BsFiletypeDocx className={`text-blue-700 ${className}`} />,
     xlsx: <BsFiletypeXlsx className={`text-green-600 ${className}`} />,
+    xls: <BsFiletypeXlsx className={`text-green-600 ${className}`} />, // Added for Excel files
     pptx: <BsFiletypePptx className={`text-orange-600 ${className}`} />,
     txt: <BsFiletypeTxt className={`text-gray-500 ${className}`} />,
     csv: <BsFiletypeCsv className={`text-teal-600 ${className}`} />,
