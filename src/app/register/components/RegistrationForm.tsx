@@ -280,7 +280,7 @@ const RegistrationForm = () => {
             <div className="flex flex-col sm:flex-row gap-3 pt-4">
               <Button
                 type="submit"
-                className="flex-1 h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium"
+                className="flex-1 h-12 bg-blue-800 hover:bg-blue-700 text-white font-medium"
               >
                 CREAR CUENTA
               </Button>

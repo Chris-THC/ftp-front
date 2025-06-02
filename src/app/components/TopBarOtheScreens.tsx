@@ -43,7 +43,7 @@ const TopBarOtherScreens = () => {
   };
 
   return (
-    <div className="relative z-10 flex justify-between items-center p-2 h-14 bg-[#1111]/90 text-white">
+    <div className="relative z-10 flex justify-between items-center p-2 h-12 bg-[#111] text-white">
       {/* IZQUIERDA */}
       <div className="flex items-center gap-2">
         <button

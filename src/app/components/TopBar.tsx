@@ -68,7 +68,6 @@ const TopBar = () => {
     e.target.value = "";
   };
 
-  // Función para manejar la creación de la carpeta
   const handleCreateFolder = () => {
     const directoryPath = `${user!.personalPath}/${folderName}`;
 
@@ -80,9 +79,8 @@ const TopBar = () => {
         toast.error("Error al crear el directorio");
       },
     });
-    // Cierra el modal después de crear la carpeta
     setIsFolderModalOpen(false);
-    setFolderName(""); // Limpia el input después de crear la carpeta
+    setFolderName("");
   };
 
   const handleGoUsersScreen = () => {
@@ -108,7 +106,7 @@ const TopBar = () => {
   };
 
   return (
-    <div className="relative z-10 flex justify-between items-center p-2 h-14 bg-[#1111]/90 text-white">
+    <div className="relative z-10 flex justify-between items-center p-2 h-12 bg-[#111] text-white">
       {/* IZQUIERDA */}
       <div className="flex items-center gap-2">
         <button className="p-2 hover:bg-[#111]/60 rounded-md transition-colors">
