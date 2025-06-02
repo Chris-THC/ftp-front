@@ -260,7 +260,7 @@ export default function UserManagementTable() {
                           </Badge>
                         </TableCell>
                         <TableCell className="hidden lg:table-cell">
-                          <span className="text-sm font-mono text-muted-foreground truncate max-w-[200px] block">
+                          <span className="text-sm font-mono text-muted-foreground truncate max-w-[350px] block">
                             {personalInfo.personalPath}
                           </span>
                         </TableCell>
