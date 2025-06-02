@@ -20,7 +20,6 @@ import {
   ChevronRight,
   Download,
   Edit,
-  FileText,
   Folder,
   Home,
   Menu,
@@ -34,6 +33,7 @@ import { useDeleteFileMutation } from "../api/GetFiles/FtpDeleteFile";
 import downloadFile from "../api/GetFiles/FtpDonwload";
 import { useFolderTreeQuery } from "../api/GetFiles/FtpFilesTree";
 import { useRenameMutation } from "../api/GetFiles/FtpRename";
+import { getFileIcon } from "../components/FileIcon";
 import { LoadingWithText } from "../components/LoadingSpinner";
 import ActionButtons from "./components/ActionButtons";
 import { RenameModal } from "./components/ModalRename";
@@ -418,13 +418,12 @@ export default function FileExplorer() {
                       }
                     >
                       <TableCell className="font-medium">
-                        <div className="flex items-center">
-                          {item.directory ? (
-                            <Folder className="h-5 w-5 text-amber-500 mr-2" />
-                          ) : (
-                            <FileText className="h-5 w-5 text-gray-500 mr-2" />
-                          )}
-                          {item.name}
+                        <div className="flex items-center gap-2 p-2 rounded  cursor-pointer">
+                          {getFileIcon({
+                            name: item.name,
+                            isDirectory: item.directory,
+                          })}
+                          <span className="truncate">{item.name}</span>
                         </div>
                       </TableCell>
                       <TableCell>
