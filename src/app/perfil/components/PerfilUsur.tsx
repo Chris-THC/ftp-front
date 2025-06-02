@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuthStore } from "@/store/authStore";
+import { useStoreNumControlByUser } from "@/lib/store/NumControlByUser";
 import { AlertCircle, Eye, EyeOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type React from "react";
@@ -21,12 +21,12 @@ import { useState } from "react";
 
 export default function PerfilUser() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { numControlByUser } = useStoreNumControlByUser();
   const {
     data: userData,
     isLoading,
     isError,
-  } = useGetUserByControlNumber(user!.controlNum);
+  } = useGetUserByControlNumber(numControlByUser);
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

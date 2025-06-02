@@ -1,7 +1,7 @@
 "use client";
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFolderTreeQuery } from "../api/GetFiles/FtpFilesTree";
 import { useRenameMutation } from "../api/GetFiles/FtpRename";
 import TopBar from "../components/TopBar";
@@ -20,7 +20,7 @@ export default function DesktopComponent() {
     data: files = [],
     isLoading,
     isError,
-  } = useFolderTreeQuery(user?.personalPath || "");
+  } = useFolderTreeQuery(user!.personalPath);
 
   const renameMutation = useRenameMutation();
 
@@ -30,6 +30,34 @@ export default function DesktopComponent() {
       file.fullPath === editingItemId ? { ...file, name: editingName } : file
     );
   }, [files, editingItemId, editingName]);
+
+  const finishEditing = useCallback(
+    (save = true) => {
+      if (save && editingItemId) {
+        const oldPath = editingItemId;
+        const newPath = `${oldPath.substring(
+          0,
+          oldPath.lastIndexOf("/") + 1
+        )}${editingName}`;
+
+        renameMutation.mutate(
+          { oldPath, newPath },
+          {
+            onSuccess: () => {
+              console.log(`Renamed successfully: ${oldPath} -> ${newPath}`);
+            },
+            onError: () => {
+              console.error("Failed to rename the file or folder.");
+            },
+          }
+        );
+      }
+
+      setEditingItemId(null);
+      setEditingName("");
+    },
+    [editingItemId, editingName, renameMutation]
+  );
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -46,7 +74,7 @@ export default function DesktopComponent() {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [editingItemId, editingName]);
+  }, [editingItemId, editingName, finishEditing]);
 
   const handleIconClick = (e: React.MouseEvent, fullPath: string) => {
     e.stopPropagation(); // Evita que el evento se propague al contenedor
@@ -79,31 +107,6 @@ export default function DesktopComponent() {
     setEditingName(e.target.value);
   };
 
-  const finishEditing = (save = true) => {
-    if (save && editingItemId) {
-      const oldPath = editingItemId;
-      const newPath = `${oldPath.substring(
-        0,
-        oldPath.lastIndexOf("/") + 1
-      )}${editingName}`;
-
-      renameMutation.mutate(
-        { oldPath, newPath },
-        {
-          onSuccess: () => {
-            console.log(`Renamed successfully: ${oldPath} -> ${newPath}`);
-          },
-          onError: () => {
-            console.error("Failed to rename the file or folder.");
-          },
-        }
-      );
-    }
-
-    setEditingItemId(null);
-    setEditingName("");
-  };
-
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -121,13 +124,13 @@ export default function DesktopComponent() {
       <div
         className="absolute inset-0 z-0 bg-cover bg-center"
         style={{
-          backgroundImage: "url('/img3.jpg')",
+          backgroundImage: "url('/img10.jpg')",
           opacity: 0.7,
         }}
       />
       <TopBar />
 
-      <div className="relative z-0 w-full h-[calc(12vh-40px)] grid grid-cols-[repeat(auto-fill,_120px)] gap-4 p-4 mx-10 my-8">
+      <div className="relative z-0 w-full h-[calc(100vh-12vh)] overflow-auto grid grid-cols-[repeat(auto-fill,_120px)] gap-4 p-4 mx-10 my-8">
         {isLoading ? (
           <p className="col-span-full text-center text-white"></p>
         ) : isError ? (

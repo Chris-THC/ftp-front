@@ -147,7 +147,7 @@ export default function UserManagementTable() {
         </Button>
         <Button
           onClick={handleRegisterNewUser}
-          className="w-fit md:ml-auto bg-blue-600 hover:bg-blue-700 text-white"
+          className="w-fit md:ml-auto bg-blue-800 hover:bg-blue-700 text-white"
         >
           <UserPlus className="mr-2 h-4 w-4" />
           Registrar nuevo usuario
@@ -167,7 +167,7 @@ export default function UserManagementTable() {
           </Button>
           <Button
             onClick={handleRegisterNewUser}
-            className="w-fit md:ml-auto bg-blue-600 hover:bg-blue-700 text-white"
+            className="w-fit md:ml-auto bg-blue-800 hover:bg-blue-700 text-white"
           >
             <UserPlus className="mr-2 h-4 w-4" />
             Registrar usuario
@@ -260,7 +260,7 @@ export default function UserManagementTable() {
                           </Badge>
                         </TableCell>
                         <TableCell className="hidden lg:table-cell">
-                          <span className="text-sm font-mono text-muted-foreground truncate max-w-[200px] block">
+                          <span className="text-sm font-mono text-muted-foreground truncate max-w-[350px] block">
                             {personalInfo.personalPath}
                           </span>
                         </TableCell>

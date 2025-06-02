@@ -1,4 +1,7 @@
 import { useDeleteDirectory } from "@/app/api/GetFiles/FtpDeleteDirectory";
+import { useDeleteFileMutation } from "@/app/api/GetFiles/FtpDeleteFile";
+import downloadFile from "@/app/api/GetFiles/FtpDonwload";
+import { getFileIcon } from "@/app/components/FileIcon";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,18 +9,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Download,
-  File as FileIcon,
-  Folder,
-  MoreHorizontal,
-  Trash2,
-} from "lucide-react";
+import { Download, MoreHorizontal, Trash2 } from "lucide-react";
 import React, { useEffect } from "react";
 import toast from "react-hot-toast";
 import { File } from "../interface/Interface";
-import { useDeleteFileMutation } from "@/app/api/GetFiles/FtpDeleteFile";
-import downloadFile from "@/app/api/GetFiles/FtpDonwload";
 
 interface DesktopFileProps {
   file: File;
@@ -44,12 +39,11 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
 }) => {
   const ftpDeleteDirectory = useDeleteDirectory();
   const ftpDeleteFile = useDeleteFileMutation();
-
-  const icon = file.directory ? (
-    <Folder className="h-10 w-10" fill="#FFB74D" stroke="#F57C00" />
-  ) : (
-    <FileIcon className="h-10 w-10" />
-  );
+  const icon = getFileIcon({
+    name: file.name,
+    isDirectory: file.directory,
+    className: "h-10 w-10",
+  });
 
   let clickTimeout: NodeJS.Timeout;
 
@@ -71,7 +65,7 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
       textarea.style.height = "auto";
       textarea.style.height = textarea.scrollHeight + "px";
     }
-  }, [editingName, editingItemId]);
+  }, [editingName, editingItemId, file.fullPath, inputRef]);
 
   const handleDownload = async (file: File): Promise<void> => {
     try {
@@ -144,7 +138,9 @@ const DesktopFile: React.FC<DesktopFileProps> = ({
     >
       <div
         className={`flex items-center justify-center w-16 h-16 rounded-sm relative ${
-          file.directory ? "bg-[#FFB74D]" : "bg-gray-600"
+          file.directory
+            ? "bg-[#FFB74D]"
+            : "backdrop-blur-md border border-gray-500"
         }`}
       >
         {icon}

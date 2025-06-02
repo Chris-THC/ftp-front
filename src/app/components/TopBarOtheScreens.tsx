@@ -5,6 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useStoreNumControlByUser } from "@/lib/store/NumControlByUser";
 import { useAuthStore } from "@/store/authStore";
 import { Folder, Home, ListTodo, LogOut, User, UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -12,6 +13,7 @@ import { useState } from "react";
 
 const TopBarOtherScreens = () => {
   const router = useRouter();
+  const { setNumControlByUser } = useStoreNumControlByUser();
   const { user, logout } = useAuthStore();
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
@@ -24,6 +26,7 @@ const TopBarOtherScreens = () => {
   };
 
   const handleGoProfile = () => {
+    setNumControlByUser(user!.controlNum);
     router.push("/perfil");
   };
 
@@ -40,7 +43,7 @@ const TopBarOtherScreens = () => {
   };
 
   return (
-    <div className="relative z-10 flex justify-between items-center p-2 h-14 bg-[#1111]/90 text-white">
+    <div className="relative z-10 flex justify-between items-center p-2 h-12 bg-[#111] text-white">
       {/* IZQUIERDA */}
       <div className="flex items-center gap-2">
         <button

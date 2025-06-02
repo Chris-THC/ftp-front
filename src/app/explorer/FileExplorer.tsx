@@ -20,7 +20,6 @@ import {
   ChevronRight,
   Download,
   Edit,
-  FileText,
   Folder,
   Home,
   Menu,
@@ -34,6 +33,7 @@ import { useDeleteFileMutation } from "../api/GetFiles/FtpDeleteFile";
 import downloadFile from "../api/GetFiles/FtpDonwload";
 import { useFolderTreeQuery } from "../api/GetFiles/FtpFilesTree";
 import { useRenameMutation } from "../api/GetFiles/FtpRename";
+import { getFileIcon } from "../components/FileIcon";
 import { LoadingWithText } from "../components/LoadingSpinner";
 import ActionButtons from "./components/ActionButtons";
 import { RenameModal } from "./components/ModalRename";
@@ -110,14 +110,16 @@ export default function FileExplorer() {
     }
   };
 
+  const userPersonalPath = user!.personalPath; // Extract complex expression
+  
   const renderBreadcrumb = useMemo(() => {
     // 1. Obtener segmentos de la ruta del usuario (su "raíz" permitida)
-    const userPathSegments = user!.personalPath.split("/").filter(Boolean);
+    const userPathSegments = userPersonalPath.split("/").filter(Boolean);
     // 2. Obtener segmentos de la ruta actual
     const currentPathSegments = currentPath.split("/").filter(Boolean);
 
     // 3. Encontrar el punto de inicio para los segmentos a mostrar en el breadcrumb.
-    // Esto asegura que no mostremos "home", "admin" si el user!.personalPath ya los contiene.
+    // Esto asegura que no mostremos "home", "admin" si el userPersonalPath ya los contiene.
     let startIndex = 0;
     for (let i = 0; i < userPathSegments.length; i++) {
       if (userPathSegments[i] === currentPathSegments[i]) {
@@ -127,12 +129,12 @@ export default function FileExplorer() {
       }
     }
 
-    // 4. Los segmentos a "mostrar" en el breadcrumb serán solo los que están después del user!.personalPath.
+    // 4. Los segmentos a "mostrar" en el breadcrumb serán solo los que están después del userPersonalPath.
     const displaySegments = currentPathSegments.slice(startIndex);
 
     // 5. Inicializar el acumulador de ruta con la ruta completa del usuario.
     // Esto es crucial para construir enlaces de navegación válidos desde la "raíz" del usuario.
-    let pathAccumulator = user!.personalPath;
+    let pathAccumulator = userPersonalPath;
 
     return (
       <div className="flex items-center space-x-1 text-sm text-gray-600 px-4 py-2 bg-gray-50 border-b">
@@ -141,7 +143,7 @@ export default function FileExplorer() {
           variant="ghost"
           size="icon"
           className="h-6 w-6 text-gray-500"
-          onClick={() => handleFolderNavigation(user!.personalPath)}
+          onClick={() => handleFolderNavigation(userPersonalPath)}
           title="Ir a mi carpeta raíz"
         >
           <Home className="h-4 w-4" />
@@ -154,7 +156,7 @@ export default function FileExplorer() {
             <Button
               variant="link"
               className="p-0 h-auto text-gray-600 hover:text-blue-600"
-              onClick={() => handleFolderNavigation(user!.personalPath)}
+              onClick={() => handleFolderNavigation(userPersonalPath)}
             >
               {userPathSegments[userPathSegments.length - 1]}
             </Button>
@@ -189,7 +191,7 @@ export default function FileExplorer() {
         })}
       </div>
     );
-  }, [currentPath, user!.personalPath]);
+  }, [currentPath, userPersonalPath]);
 
   // Esta función ahora renderiza el árbol completo desde la raíz
   const renderFileTree = (items: FileItem[], level = 0) => {
@@ -418,13 +420,12 @@ export default function FileExplorer() {
                       }
                     >
                       <TableCell className="font-medium">
-                        <div className="flex items-center">
-                          {item.directory ? (
-                            <Folder className="h-5 w-5 text-amber-500 mr-2" />
-                          ) : (
-                            <FileText className="h-5 w-5 text-gray-500 mr-2" />
-                          )}
-                          {item.name}
+                        <div className="flex items-center gap-2 p-2 rounded  cursor-pointer">
+                          {getFileIcon({
+                            name: item.name,
+                            isDirectory: item.directory,
+                          })}
+                          <span className="truncate">{item.name}</span>
                         </div>
                       </TableCell>
                       <TableCell>
