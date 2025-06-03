@@ -1,4 +1,5 @@
 # Stage 1: Build the application
+
 FROM node:20-bullseye AS builder
 
 # Set working directory
@@ -18,6 +19,7 @@ RUN npm run build
 
 # Stage 2: Run the application
 FROM node:20-bullseye AS runner
+
 WORKDIR /app
 
 # Don't run production as root
