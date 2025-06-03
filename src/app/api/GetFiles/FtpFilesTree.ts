@@ -21,7 +21,7 @@ export const useFolderTreeQuery = (path: string) => {
   return useQuery({
     queryKey: ["folderTree", path],
     queryFn: () => fetchFolderTree(path),
-    staleTime: 5 * 60 * 1000, 
+    staleTime: 1 * 60 * 1000, 
     retry: 3,
   });
 };
