@@ -95,16 +95,15 @@ const LoginForm: React.FC = () => {
       <div className="relative z-10 flex flex-col md:flex-row items-center justify-center gap-16 max-w-7xl mx-auto">
         {/* Sección de texto izquierda */}
         <div className="text-white text-center md:text-left max-w-2xl p-4 md:p-8">
-          <h2 className="text-3xl md:text-4xl font-extrabold leading-tight text-center md:text-left">
-            Maestría en Sistemas Computacionales
+          <h2 className="text-3xl md:text-3xl font-extrabold leading-tight text-center md:text-left">
+            MSC-DEPI
           </h2>
-          <p className="mt-4 md:mt-6 text-lg md:text-2xl font-light text-center md:text-left">
-            Instituto Tecnológico de Orizaba
-          </p>
           <p className="mt-6 md:mt-8 text-sm md:text-lg opacity-90 leading-relaxed text-center md:text-left">
-            Este sistema está diseñado para gestionar documentos relacionados
-            con la maestría en sistemas computacionales, ofreciendo una
-            plataforma intuitiva y segura.
+            Sistema diseñado para gestionar documentos relacionados con la
+            maestría en sistemas computacionales.
+          </p>
+          <p className="mt-2 text-sm md:text-md opacity-80 leading-relaxed text-center md:text-left">
+            Ofreciendo una plataforma intuitiva y segura.
           </p>
         </div>
 
