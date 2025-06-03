@@ -31,6 +31,7 @@ export const useRegisterUser = () => {
     mutationFn: (payload: RegisterUserPayload) => registerUser(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["usersInformation"] });
+      queryClient.invalidateQueries({ queryKey: ["folderTree"] });
     },
     onError: (error) => {
       console.error("Error registering user:", error);
