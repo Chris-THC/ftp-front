@@ -74,8 +74,8 @@ export const useAuthStore = create<AuthState>((set) => {
       // Guardar token en cookie persistente (opcionalmente hasta que expire)
       const expireDays = Math.ceil((decoded.exp - Date.now() / 1000) / 86400);
       Cookies.set("token", token, {
-        secure: true,
-        sameSite: "strict",
+        secure: false, // ¡Cambiar a true para producción con HTTPS!
+        sameSite: "Lax", // Considera "Lax" para un equilibrio
         expires: expireDays,
       });
 
